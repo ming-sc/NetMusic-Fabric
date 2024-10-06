@@ -1,6 +1,7 @@
 package com.github.tartaricacid.netmusic.audio;
 
 import com.github.tartaricacid.netmusic.init.InitSounds;
+import com.github.tartaricacid.netmusic.tileentity.TileEntityMusicPlayer;
 import javazoom.jl.decoder.JavaLayerException;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -65,15 +66,15 @@ public class NetMusicSound extends AbstractTickableSoundInstance {
             }
         }
 
-//        BlockEntity te = world.getBlockEntity(pos);
-//        if (te instanceof TileEntityMusicPlayer) {
-//            TileEntityMusicPlayer musicPlay = (TileEntityMusicPlayer) te;
-//            if (!musicPlay.isPlay()) {
-//                this.stop();
-//            }
-//        } else {
-//            this.stop();
-//        }
+        BlockEntity te = world.getBlockEntity(pos);
+        if (te instanceof TileEntityMusicPlayer) {
+            TileEntityMusicPlayer musicPlay = (TileEntityMusicPlayer) te;
+            if (!musicPlay.isPlay()) {
+                this.stop();
+            }
+        } else {
+            this.stop();
+        }
     }
 
     @Override

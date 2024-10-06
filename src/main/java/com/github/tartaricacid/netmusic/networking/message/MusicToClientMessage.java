@@ -1,17 +1,20 @@
 package com.github.tartaricacid.netmusic.networking.message;
 
+import com.github.tartaricacid.netmusic.NetMusic;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 /**
  * @author : IMG
  * @create : 2024/10/3
  */
-public class MusicToClientMessage {
+public class MusicToClientMessage implements Message<MusicToClientMessage> {
+    private final Identifier PACKET_ID = new Identifier(NetMusic.MOD_ID, "play_music");
     private final BlockPos pos;
     private final String url;
     private final int timeSecond;
@@ -58,5 +61,20 @@ public class MusicToClientMessage {
 
     public String getSongName() {
         return songName;
+    }
+
+    @Override
+    public PacketByteBuf toBuffer() {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBlockPos(pos);
+        buf.writeString(url);
+        buf.writeInt(timeSecond);
+        buf.writeString(songName);
+        return buf;
+    }
+
+    @Override
+    public Identifier getPacketId() {
+        return PACKET_ID;
     }
 }

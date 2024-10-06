@@ -3,10 +3,12 @@ package com.github.tartaricacid.netmusic.item;
 import com.github.tartaricacid.netmusic.api.pojo.NetEaseMusicList;
 import com.github.tartaricacid.netmusic.api.pojo.NetEaseMusicSong;
 import com.github.tartaricacid.netmusic.constants.NetworkingConst;
+import com.github.tartaricacid.netmusic.init.InitItems;
 import com.github.tartaricacid.netmusic.networking.message.MusicToClientMessage;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,10 +18,15 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Language;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -28,27 +35,99 @@ import java.util.List;
  * @create : 2024/10/2
  */
 public class ItemMusicCD extends Item {
+    public static final String SONG_INFO_TAG = "NetMusicSongInfo";
 
     public ItemMusicCD(Settings settings) {
         super(settings);
     }
 
+//    @Override
+//    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+//        if (world.isClient) return super.use(world, user, hand);
+//
+//        PacketByteBuf buf = MusicToClientMessage.toBuffer(
+//                new MusicToClientMessage(
+//                        user.getBlockPos(),
+//                        "https://music.163.com/song/media/outer/url?id=1311347847.mp3",
+//                        155,
+//                        "Sea,You Next"
+//                )
+//        );
+//
+//        ServerPlayNetworking.send((ServerPlayerEntity) user, NetworkingConst.PLAY_MUSIC_PACKET_ID, buf);
+//
+//        return TypedActionResult.pass(user.getStackInHand(hand));
+//    }
+
+    public static SongInfo getSongInfo(ItemStack stack) {
+        if (stack.getItem() == InitItems.MUSIC_CD) {
+            NbtCompound tag = stack.getOrCreateNbt();
+            if (tag != null && tag.contains(SONG_INFO_TAG, NbtElement.COMPOUND_TYPE)) {
+                NbtCompound infoTag = tag.getCompound(SONG_INFO_TAG);
+                return SongInfo.deserializeNBT(infoTag);
+            }
+        }
+        return null;
+    }
+
+    public static ItemStack setSongInfo(SongInfo info, ItemStack stack) {
+        if (stack.getItem() == InitItems.MUSIC_CD) {
+            NbtCompound tag = stack.getOrCreateNbt();
+            NbtCompound songInfoTag = new NbtCompound();
+            SongInfo.serializeNBT(info, songInfoTag);
+            tag.put(SONG_INFO_TAG, songInfoTag);
+            stack.setNbt(tag);
+        }
+        return stack;
+    }
+
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (world.isClient) return super.use(world, user, hand);
+    public Text getName(ItemStack stack) {
+        SongInfo info = getSongInfo(stack);
+        if (info != null){
+            String name = info.songName;
+            if (info.vip){
+                name = name + " §4§l[VIP]";
+            }
+            if (info.readOnly){
+                MutableText readOnlyText = Text.translatable("tooltips.netmusic.cd.read_only").formatted(Formatting.YELLOW);
+                return Text.literal(name).append(Text.literal(" ")).append(readOnlyText);
+            }
+            return Text.literal(name);
+        }
+        return super.getName(stack);
+    }
 
-        PacketByteBuf buf = MusicToClientMessage.toBuffer(
-                new MusicToClientMessage(
-                        user.getBlockPos(),
-                        "https://music.163.com/song/media/outer/url?id=1311347847.mp3",
-                        155,
-                        "Sea,You Next"
-                )
-        );
+    private String getSongTime(int songTime){
+        int min = songTime / 60;
+        int sec = songTime % 60;
+        String minStr = min <= 9 ? ("0" + min) : ("" + min);
+        String secStr = sec <= 9 ? ("0" + sec) : ("" + sec);
+        String format = Language.getInstance().get("tooltips.netmusic.cd.time.format");
+        return String.format(format, minStr, secStr);
+    }
 
-        ServerPlayNetworking.send((ServerPlayerEntity) user, NetworkingConst.PLAY_MUSIC_PACKET_ID, buf);
-
-        return TypedActionResult.pass(user.getStackInHand(hand));
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        SongInfo info = getSongInfo(stack);
+        final String prefix = "§a▍ §7";
+        final String delimiter = ": ";
+        Language language = Language.getInstance();
+        if (info != null){
+            if (StringUtils.isNoneBlank(info.transName)){
+                String text = prefix + language.get("tooltips.netmusic.cd.trans_name") + delimiter + "§6" + info.transName;
+                tooltip.add(Text.literal(text));
+            }
+            if (info.artists != null && !info.artists.isEmpty()){
+                String artistNames = StringUtils.join(info.artists, " | ");
+                String text = prefix + language.get("tooltips.netmusic.cd.artists") + delimiter + "§3" + artistNames;
+                tooltip.add(Text.literal(text));
+            }
+            String text = prefix + language.get("tooltips.netmusic.cd.time") + delimiter + "§5" + getSongTime(info.songTime);
+            tooltip.add(Text.literal(text));
+        }else {
+            tooltip.add(Text.translatable("tooltips.netmusic.cd.empty").formatted(Formatting.RED));
+        }
     }
 
     public static class SongInfo{
