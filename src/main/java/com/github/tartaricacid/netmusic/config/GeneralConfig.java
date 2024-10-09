@@ -15,20 +15,20 @@ import java.net.Proxy;
  * @create : 2024/10/3
  */
 public class GeneralConfig {
-    @SerialEntry(comment = "Whether stereo playback is enabled")
+    @SerialEntry(value = "EnableStereo", comment = "Whether stereo playback is enabled")
     public static Boolean ENABLE_STEREO = true;
 
-    @SerialEntry(comment = "Proxy Type, http and socks are supported")
+    @SerialEntry(value = "ProxyType", comment = "Proxy Type, http and socks are supported")
     public static Proxy.Type PROXY_TYPE = Proxy.Type.DIRECT;
 
-    @SerialEntry(comment = "Proxy Address, such as 127.0.0.1:1080, empty is no proxy")
+    @SerialEntry(value = "ProxyAddress", comment = "Proxy Address, such as 127.0.0.1:1080, empty is no proxy")
     public static String PROXY_ADDRESS = "";
 
     public static final ConfigClassHandler<GeneralConfig> INSTANCE = ConfigClassHandler
             .createBuilder(GeneralConfig.class)
             .id(new Identifier(NetMusic.MOD_ID, "common"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
-                    .setPath(FabricLoader.getInstance().getConfigDir().resolve(NetMusic.MOD_ID).resolve("common.json"))
+                    .setPath(FabricLoader.getInstance().getConfigDir().resolve(NetMusic.MOD_ID).resolve("common.json5"))
                     .appendGsonBuilder(GsonBuilder::setPrettyPrinting)
                     .setJson5(true)
                     .build()

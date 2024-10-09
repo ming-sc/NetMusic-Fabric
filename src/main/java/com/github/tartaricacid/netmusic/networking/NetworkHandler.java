@@ -1,6 +1,8 @@
 package com.github.tartaricacid.netmusic.networking;
 
 import com.github.tartaricacid.netmusic.networking.message.Message;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;

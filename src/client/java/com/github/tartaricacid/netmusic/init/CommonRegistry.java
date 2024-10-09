@@ -1,8 +1,13 @@
 package com.github.tartaricacid.netmusic.init;
 
+import com.github.tartaricacid.netmusic.NetMusic;
 import com.github.tartaricacid.netmusic.constants.NetworkingConst;
+import com.github.tartaricacid.netmusic.gui.CDBurnerMenuScreen;
 import com.github.tartaricacid.netmusic.receiver.MusicToClientMessageReceiver;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
+import net.minecraft.client.render.RenderLayer;
 
 /**
  * @author : IMG
@@ -12,5 +17,7 @@ public class CommonRegistry {
 
     public static void register() {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConst.PLAY_MUSIC_PACKET_ID, MusicToClientMessageReceiver::receive);
+        BlockRenderLayerMap.INSTANCE.putBlock(InitBlocks.CD_BURNER, RenderLayer.getCutout());
+        ScreenRegistry.register(NetMusic.CD_BURNER_MENU_SCREEN_HANDLER_TYPE, CDBurnerMenuScreen::new);
     }
 }

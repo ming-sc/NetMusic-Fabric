@@ -185,7 +185,7 @@ public class ItemMusicCD extends Item {
             this.songUrl = nbt.getString("url");
             this.songName = nbt.getString("name");
             this.songTime = nbt.getInt("time");
-            if (nbt.contains("trans_name", NbtElement.SHORT_TYPE)) {
+            if (nbt.contains("trans_name", NbtElement.STRING_TYPE)) {
                 this.transName = nbt.getString("trans_name");
             }
             if (nbt.contains("vip", NbtElement.BYTE_TYPE)) {

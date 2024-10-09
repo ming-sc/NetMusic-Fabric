@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
  * @create : 2024/10/3
  */
 public class MusicToClientMessage implements Message<MusicToClientMessage> {
-    private final Identifier PACKET_ID = new Identifier(NetMusic.MOD_ID, "play_music");
+    private static final Identifier PACKET_ID = new Identifier(NetMusic.MOD_ID, "play_music");
     private final BlockPos pos;
     private final String url;
     private final int timeSecond;

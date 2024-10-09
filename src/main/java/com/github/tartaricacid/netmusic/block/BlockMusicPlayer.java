@@ -3,9 +3,7 @@ package com.github.tartaricacid.netmusic.block;
 import com.github.tartaricacid.netmusic.item.ItemMusicCD;
 import com.github.tartaricacid.netmusic.tileentity.TileEntityMusicPlayer;
 import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -127,6 +125,7 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
                 musicPlayer.setPlay(false);
                 musicPlayer.setCurrentTime(0);
                 Block.dropStack(world, pos, stack);
+                world.updateComparators(pos, this);
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);

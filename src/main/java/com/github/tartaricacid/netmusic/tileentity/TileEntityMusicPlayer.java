@@ -34,6 +34,7 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
     private boolean isPlay = false;
     private int currentTime;
     private boolean hasSignal = false;
+    private boolean isEmpty = true;
 
     public TileEntityMusicPlayer(BlockPos blockPos, BlockState blockState) {
         super(TYPE, blockPos, blockState);
@@ -52,15 +53,15 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
     @Override
     public ItemStack removeStack(int slot, int amount) {
         ItemStack result = Inventories.splitStack(getItems(), slot, amount);
-        if (!result.isEmpty()) {
-            markDirty();
-        }
+        markDirty();
         return result;
     }
 
     @Override
     public ItemStack removeStack(int slot) {
-        return Inventories.removeStack(getItems(), slot);
+        ItemStack result = Inventories.removeStack(getItems(), slot);
+        markDirty();
+        return result;
     }
 
     @Override
@@ -83,6 +84,7 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
 
     public void setCurrentTime(int currentTime) {
         this.currentTime = currentTime;
+        markDirty();
     }
 
     public int getCurrentTime(){
@@ -103,23 +105,20 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
 
     public static void tick(World world, BlockPos blockPos, BlockState blockState, TileEntityMusicPlayer te){
         te.tickTime();
-        if (0 < te.getCurrentTime() && te.getCurrentTime() < 16 && te.getCurrentTime() % 5 == 0){
-            System.out.println("music stop!");
+        if ((0 < te.getCurrentTime() && te.getCurrentTime() < 16 && te.getCurrentTime() % 5 == 0) || te.getStack(0).isEmpty()){
             te.setPlay(false);
-            System.out.println(te.isPlay());
-            te.markDirty();
-            world.updateListeners(blockPos, blockState, blockState, 0);
         }
+        te.markDirty();
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
+        Inventories.readNbt(nbt, items);
         isPlay = nbt.getBoolean(IS_PLAY_TAG);
         currentTime = nbt.getInt(CURRENT_TIME_TAG);
         hasSignal = nbt.getBoolean(SIGNAL_TAG);
-        Inventories.readNbt(nbt, items);
-
+        isEmpty = nbt.getBoolean("isEmpty");
     }
 
     @Override
@@ -128,6 +127,7 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
         nbt.putBoolean(IS_PLAY_TAG, isPlay);
         nbt.putInt(CURRENT_TIME_TAG, currentTime);
         nbt.putBoolean(SIGNAL_TAG, hasSignal);
+        nbt.putBoolean("isEmpty", isEmpty);
         super.writeNbt(nbt);
     }
 
@@ -148,14 +148,29 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
 
     public void setPlay(boolean play){
         isPlay = play;
+        markDirty();
     }
 
     public void setPlayToClient(ItemMusicCD.SongInfo info){
         this.setCurrentTime(info.songTime * 20 + 64);
-        this.isPlay = true;
+        setPlay(true);
         if (world != null && !world.isClient){
              MusicToClientMessage msg = new MusicToClientMessage(pos, info.songUrl, info.songTime, info.songName);
              NetworkHandler.sendToNearBy(world, pos, msg);
         }
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        isEmpty = getStack(0).isEmpty();
+        BlockState state = world.getBlockState(pos);
+        world.updateListeners(pos, state, state, 0);
+//        world.updateListeners(pos, getCachedState(), getCachedState(), 0);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return isEmpty;
     }
 }

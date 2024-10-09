@@ -41,13 +41,13 @@ public class MusicPlayerRenderer implements BlockEntityRenderer<TileEntityMusicP
         Direction facing = entity.getCachedState().get(HorizontalFacingBlock.FACING);
         ItemStack cd = entity.getStack(0);
         ModelPart disc = MODEL.getDiscBone();
-        disc.visible = !cd.isEmpty();
-        if (!cd.isEmpty() && entity.isPlay()) {
-            // 每秒执行一次
-            if ( System.currentTimeMillis() % 1000 == 0){
-                System.out.println(entity.getCurrentTime());
-                System.out.println("CD round!");
-            }
+        disc.visible = !entity.isEmpty();
+//        if (!cd.isEmpty()){
+//            if (entity.getWorld().getTime() % 20 == 0) {
+//                System.out.println(cd.getItem());
+//            }
+//        }
+        if (!entity.isEmpty() && entity.isPlay()) {
             disc.yaw = (float) ((2 * Math.PI / 40) * ((System.currentTimeMillis() / 50) % 40));
         }
         renderMusicPlayer(matrices, vertexConsumers, light, facing);
@@ -74,8 +74,6 @@ public class MusicPlayerRenderer implements BlockEntityRenderer<TileEntityMusicP
         matrixStack.multiply(Axis.ZP.rotationDegrees(180));
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(TEXTURE));
         MODEL.render(matrixStack, buffer, combinedLight, OverlayTexture.DEFAULT_UV, 1, 1, 1, 1);
-//        MinecraftClient.getInstance().getItemRenderer().renderItem(new ItemStack(InitBlocks.MUSIC_PLAYER, 0), ModelTransformationMode.GROUND, combinedLight, OverlayTexture.DEFAULT_UV, matrixStack, vertexConsumers, entity.getWorld(), 0);
-//        MinecraftClient.getInstance().getItemRenderer().renderItem();
         matrixStack.pop();
     }
 }
