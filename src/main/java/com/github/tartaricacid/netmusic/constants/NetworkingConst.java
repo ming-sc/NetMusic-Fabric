@@ -9,4 +9,5 @@ import net.minecraft.util.Identifier;
  */
 public class NetworkingConst {
     public static final Identifier PLAY_MUSIC_PACKET_ID = new Identifier(NetMusic.MOD_ID, "play_music");
+    public static final Identifier GET_MUSIC_LIST_PACKET_ID = new Identifier(NetMusic.MOD_ID, "get_music_list");
 }
