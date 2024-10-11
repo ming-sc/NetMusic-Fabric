@@ -27,6 +27,8 @@ public class InitItems {
 
     public static Item CD_BURNER = register(new BlockItem(InitBlocks.CD_BURNER, new FabricItemSettings()), "cd_burner");
 
+    public static Item COMPUTER = register(new BlockItem(InitBlocks.COMPUTER, new FabricItemSettings()), "computer");
+
     public static Item register(Item item, String id) {
         Identifier itemId = Identifier.of(NetMusic.MOD_ID, id);
         return Registry.register(Registries.ITEM, itemId, item);
@@ -38,6 +40,7 @@ public class InitItems {
             .entries((displayContext, entries) -> {
                 entries.add(new ItemStack(MUSIC_PLAYER));
                 entries.add(new ItemStack(CD_BURNER));
+                entries.add(new ItemStack(COMPUTER));
                 entries.add(new ItemStack(InitItems.MUSIC_CD));
                 for (ItemMusicCD.SongInfo info : MusicListManage.SONGS) {
                     ItemStack stack = new ItemStack(MUSIC_CD);

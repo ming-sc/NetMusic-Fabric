@@ -42,11 +42,6 @@ public class MusicPlayerRenderer implements BlockEntityRenderer<TileEntityMusicP
         ItemStack cd = entity.getStack(0);
         ModelPart disc = MODEL.getDiscBone();
         disc.visible = !entity.isEmpty();
-//        if (!cd.isEmpty()){
-//            if (entity.getWorld().getTime() % 20 == 0) {
-//                System.out.println(cd.getItem());
-//            }
-//        }
         if (!entity.isEmpty() && entity.isPlay()) {
             disc.yaw = (float) ((2 * Math.PI / 40) * ((System.currentTimeMillis() / 50) % 40));
         }

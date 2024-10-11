@@ -71,7 +71,6 @@ public class NetMusicSound extends AbstractTickableSoundInstance {
             TileEntityMusicPlayer musicPlay = (TileEntityMusicPlayer) te;
             if (!musicPlay.isPlay()) {
                 this.stop();
-                System.out.println(musicPlay.isEmpty());
             }
         } else {
             this.stop();

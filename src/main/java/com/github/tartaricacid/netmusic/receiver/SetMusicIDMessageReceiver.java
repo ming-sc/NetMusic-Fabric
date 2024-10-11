@@ -1,6 +1,7 @@
 package com.github.tartaricacid.netmusic.receiver;
 
 import com.github.tartaricacid.netmusic.inventory.CDBurnerMenu;
+import com.github.tartaricacid.netmusic.inventory.ComputerMenu;
 import com.github.tartaricacid.netmusic.networking.message.SetMusicIDMessage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,7 +24,9 @@ public class SetMusicIDMessageReceiver {
                     menu.setSongInfo(message.song);
                     return;
                 }
-                // TODO: computer
+                if (player.currentScreenHandler instanceof ComputerMenu menu) {
+                    menu.setSongInfo(message.song);
+                }
             });
         });
     }

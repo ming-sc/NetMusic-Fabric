@@ -9,17 +9,13 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.collection.DefaultedList;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author : IMG
- * @create : 2024/10/7
+ * @create : 2024/10/11
  */
-public class CDBurnerMenu extends ScreenHandler {
-
+public class ComputerMenu extends ScreenHandler {
     public final Slot input = new Slot(new SimpleInventory(1), 0, 147, 14){
         @Override
         public boolean canInsert(ItemStack stack) {
@@ -27,7 +23,7 @@ public class CDBurnerMenu extends ScreenHandler {
         }
     };
 
-    public final Slot output = new Slot(new SimpleInventory(1), 0, 147, 67){
+    public final Slot output = new Slot(new SimpleInventory(1), 0, 147, 79){
         @Override
         public boolean canInsert(ItemStack stack) {
             return false;
@@ -41,25 +37,25 @@ public class CDBurnerMenu extends ScreenHandler {
 
     private ItemMusicCD.SongInfo songInfo;
 
-    public CDBurnerMenu(int syncId, PlayerInventory inventory) {
+    public ComputerMenu(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+        super(NetMusic.COMPUTER_MENU_SCREEN_HANDLER_TYPE, syncId);
+    }
+
+    public ComputerMenu(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, null);
 
         this.addSlot(input);
         this.addSlot(output);
 
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(inventory, i, 8 + i * 18, 152));
+            this.addSlot(new Slot(inventory, i, 8 + i * 18, 192));
         }
 
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 9; ++j) {
-                this.addSlot(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 94 + i * 18));
+                this.addSlot(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 134 + i * 18));
             }
         }
-    }
-
-    public CDBurnerMenu(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-        super(NetMusic.CD_BURNER_MENU_SCREEN_HANDLER_TYPE, syncId);
     }
 
     @Override
@@ -84,11 +80,6 @@ public class CDBurnerMenu extends ScreenHandler {
             }
         }
         return null;
-    }
-
-    @Override
-    public boolean canUse(PlayerEntity player) {
-        return true;
     }
 
     @Override
@@ -121,5 +112,10 @@ public class CDBurnerMenu extends ScreenHandler {
 
     public Slot getInput() {
         return input;
+    }
+
+    @Override
+    public boolean canUse(PlayerEntity player) {
+        return true;
     }
 }
