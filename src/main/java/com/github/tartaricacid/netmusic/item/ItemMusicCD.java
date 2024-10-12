@@ -41,24 +41,6 @@ public class ItemMusicCD extends Item {
         super(settings);
     }
 
-//    @Override
-//    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-//        if (world.isClient) return super.use(world, user, hand);
-//
-//        PacketByteBuf buf = MusicToClientMessage.toBuffer(
-//                new MusicToClientMessage(
-//                        user.getBlockPos(),
-//                        "https://music.163.com/song/media/outer/url?id=1311347847.mp3",
-//                        155,
-//                        "Sea,You Next"
-//                )
-//        );
-//
-//        ServerPlayNetworking.send((ServerPlayerEntity) user, NetworkingConst.PLAY_MUSIC_PACKET_ID, buf);
-//
-//        return TypedActionResult.pass(user.getStackInHand(hand));
-//    }
-
     public static SongInfo getSongInfo(ItemStack stack) {
         if (stack.getItem() == InitItems.MUSIC_CD) {
             NbtCompound tag = stack.getOrCreateNbt();

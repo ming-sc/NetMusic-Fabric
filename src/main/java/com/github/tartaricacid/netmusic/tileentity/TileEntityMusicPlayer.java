@@ -166,7 +166,6 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
         isEmpty = getStack(0).isEmpty();
         BlockState state = world.getBlockState(pos);
         world.updateListeners(pos, state, state, 0);
-//        world.updateListeners(pos, getCachedState(), getCachedState(), 0);
     }
 
     @Override

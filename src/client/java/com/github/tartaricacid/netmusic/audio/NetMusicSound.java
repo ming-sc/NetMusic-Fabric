@@ -47,7 +47,6 @@ public class NetMusicSound extends AbstractTickableSoundInstance {
     @Override
     public void tick() {
         ClientWorld world = MinecraftClient.getInstance().world;
-//        Level world = Minecraft.getInstance().level;
         if (world == null) {
             return;
         }

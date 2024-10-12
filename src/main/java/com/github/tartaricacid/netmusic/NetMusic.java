@@ -27,6 +27,7 @@ public class NetMusic implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static WebApi NET_EASE_WEB_API;
+
 	public static final ScreenHandlerType<CDBurnerMenu> CD_BURNER_MENU_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(new Identifier(MOD_ID, "cd_burner"), CDBurnerMenu::new);
 	public static final ScreenHandlerType<ComputerMenu> COMPUTER_MENU_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(new Identifier(MOD_ID, "computer"), ComputerMenu::new);
 
@@ -36,16 +37,16 @@ public class NetMusic implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		NET_EASE_WEB_API = new NetEaseMusic().getApi();
+
 		// 加载 resource 中的歌曲列表
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new MusicListManage());
-        InitBlocks.init();
+
+		InitBlocks.init();
 		InitItems.init();
 		InitBlockEntity.init();
 		InitSounds.init();
 		CommandRegistry.registryCommand();
 		ReceiverRegistry.register();
 		GeneralConfig.INSTANCE.load();
-
-		LOGGER.info("Hello Fabric world!");
 	}
 }
