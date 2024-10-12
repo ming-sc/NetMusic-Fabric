@@ -41,5 +41,4 @@ replay_*.log
 /gradlew
 /gradlew.bat
 /LICENSE
-/gradle/
 /.github/workflows/build.yml
