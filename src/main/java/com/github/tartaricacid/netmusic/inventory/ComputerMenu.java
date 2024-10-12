@@ -79,7 +79,7 @@ public class ComputerMenu extends ScreenHandler {
                 slotByIndex.markDirty();
             }
         }
-        return null;
+        return itemStack;
     }
 
     @Override

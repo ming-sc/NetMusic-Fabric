@@ -1,5 +1,5 @@
 {
-	"required": true,
+	"required": false,
 	"package": "com.github.tartaricacid.netmusic.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [

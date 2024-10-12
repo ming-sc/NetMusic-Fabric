@@ -4,7 +4,7 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+//apply plugin: 'com.github.johnrengelman.shadow'
 
 version = project.mod_version
 group = project.maven_group
@@ -72,14 +72,12 @@ fabricApi {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "com.googlecode.soundlibs:mp3spi:1.9.5.4"
-	implementation "com.googlecode.soundlibs:jlayer:1.0.1.4"
-	implementation "com.googlecode.soundlibs:tritonus-share:0.3.7.4"
-	implementation "com.mpatric:mp3agic:0.9.1"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	implementation include("com.googlecode.soundlibs:mp3spi:1.9.5.4")
+	implementation include("com.googlecode.soundlibs:jlayer:1.0.1.4")
+	implementation include("com.googlecode.soundlibs:tritonus-share:0.3.7.4")
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-//	modImplementation "curse.maven:yacl-667299:5424129"
-	modImplementation "dev.isxander:yet-another-config-lib:3.5.0+1.20.1-fabric"
+	modImplementation include("dev.isxander:yet-another-config-lib:3.5.0+1.20.1-fabric")
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
@@ -96,22 +94,20 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 17
 }
 
-shadowJar{
-	dependencies {
-		include(dependency("com.googlecode.soundlibs:mp3spi:1.9.5.4"))
-		include(dependency("com.googlecode.soundlibs:jlayer:1.0.1.4"))
-		include(dependency("com.googlecode.soundlibs:tritonus-share:0.3.7.4"))
-		include(dependency("com.mpatric:mp3agic:0.9.1"))
-//		include(dependency("curse.maven:yacl-667299:5424129"))
-		include(dependency("dev.isxander:yet-another-config-lib:3.5.0+1.20.1-fabric"))
-	}
-
-	relocate 'javazoom.jl', 'com.github.tartaricacid.netmusic.soundlibs.javazoom.jl'
-	relocate 'javazoom.spi', 'com.github.tartaricacid.netmusic.soundlibs.javazoom.spi'
-	relocate 'org.tritonus', 'com.github.tartaricacid.netmusic.soundlibs.org.tritonus'
-
-	mergeServiceFiles()
-}
+//shadowJar{
+//	dependencies {
+//		include(dependency("com.googlecode.soundlibs:mp3spi:1.9.5.4"))
+//		include(dependency("com.googlecode.soundlibs:jlayer:1.0.1.4"))
+//		include(dependency("com.googlecode.soundlibs:tritonus-share:0.3.7.4"))
+//		include(dependency("dev.isxander:yet-another-config-lib:3.5.0+1.20.1-fabric"))
+//	}
+//
+//	relocate 'javazoom.jl', 'com.github.tartaricacid.netmusic.soundlibs.javazoom.jl'
+//	relocate 'javazoom.spi', 'com.github.tartaricacid.netmusic.soundlibs.javazoom.spi'
+//	relocate 'org.tritonus', 'com.github.tartaricacid.netmusic.soundlibs.org.tritonus'
+//
+//	mergeServiceFiles()
+//}
 
 java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task

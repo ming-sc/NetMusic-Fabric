@@ -2,16 +2,20 @@
 	"schemaVersion": 1,
 	"id": "netmusic",
 	"version": "${version}",
-	"name": "netmusic",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Net Music Mod",
+	"description": "A music player mod",
 	"authors": [
-		"Me!"
+		"TartaricAcid",
+		"郝南村",
+		"琥珀酸",
+		"帕金伊",
+		"SQwatermark"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "",
+		"sources": ""
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/netmusic/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -25,13 +29,6 @@
 			"com.github.tartaricacid.netmusic.NetMusicDataGenerator"
 		]
 	},
-	"mixins": [
-		"netmusic.mixins.json",
-		{
-			"config": "netmusic.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": ">=0.16.5",
 		"minecraft": "~1.20.1",

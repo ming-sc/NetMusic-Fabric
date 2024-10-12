@@ -83,7 +83,7 @@ public class CDBurnerMenu extends ScreenHandler {
                 slotByIndex.markDirty();
             }
         }
-        return null;
+        return itemStack;
     }
 
     @Override

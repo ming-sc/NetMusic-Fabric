@@ -78,21 +78,6 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
                 super.write(text);
             }
         };
-//        textField.setChangeListener(text -> {
-//            Matcher matcher1 = URL_1_REG.matcher(text);
-//            if (matcher1.find()) {
-//                String group = matcher1.group(1);
-//                textField.setText(group);
-//                return;
-//            }
-//
-//            Matcher matcher2 = URL_2_REG.matcher(text);
-//            if (matcher2.find()) {
-//                String group = matcher2.group(1);
-//                textField.setText(group);
-//                return;
-//            }
-//        });
 
         textField.setText(perText);
         textField.setDrawsBackground(false);
@@ -156,7 +141,6 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-//        InputUtil.Key mouseKey = InputUtil.fromKeyCode(keyCode, scanCode);
         // Prevent the E key from closing the interface
         if (keyCode == 256) {
             this.client.player.closeHandledScreen();
@@ -164,7 +148,6 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
         if (client.options.inventoryKey.matchesKey(keyCode, scanCode) && textField.isFocused()) {
             return true;
         }
-//        return !this.textField.keyPressed(keyCode, scanCode, modifiers) && !this.textField.isActive() ? super.keyPressed(keyCode, scanCode, modifiers) : true;
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 

@@ -45,6 +45,7 @@ public class NetMusic implements ModInitializer {
 		CommandRegistry.registryCommand();
 		ReceiverRegistry.register();
 		GeneralConfig.INSTANCE.load();
+
 		LOGGER.info("Hello Fabric world!");
 	}
 }
