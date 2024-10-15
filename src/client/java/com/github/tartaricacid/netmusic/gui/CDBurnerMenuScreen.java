@@ -26,6 +26,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +39,10 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
     private static final Pattern ID_REG = Pattern.compile("^\\d{4,}$");
     private static final Pattern URL_1_REG = Pattern.compile("^https://music\\.163\\.com/song\\?id=(\\d+).*$");
     private static final Pattern URL_2_REG = Pattern.compile("^https://music\\.163\\.com/#/song\\?id=(\\d+).*$");
+    // qq 音乐的分享链接正则
+    private static final Pattern QQ_SHARE_URL_REG = Pattern.compile("^https://c6\\.y\\.qq\\.com/base/fcgi-bin/u\\?__=([a-zA-Z0-9]+)$");
+    // qq 音乐的分享 ID 正则
+    private static final Pattern QQ_SHARE_ID_REG = Pattern.compile("^([a-zA-Z0-9]+)$");
     private TextFieldWidget textField;
     private CheckboxWidget readOnlyButton;
     private Text tips = Text.empty();
@@ -71,6 +76,13 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
                 Matcher matcher2 = URL_2_REG.matcher(text);
                 if (matcher2.find()) {
                     String group = matcher2.group(1);
+                    this.setText(group);
+                    return;
+                }
+
+                Matcher matcher3 = QQ_SHARE_URL_REG.matcher(text);
+                if (matcher3.find()) {
+                    String group = matcher3.group(1);
                     this.setText(group);
                     return;
                 }
@@ -184,6 +196,17 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
             }catch (Exception e){
                 this.tips = Text.translatable("gui.netmusic.cd_burner.get_info_error");
                 e.printStackTrace();
+            }
+        }else if (QQ_SHARE_ID_REG.matcher(textField.getText()).matches()) {
+            String shareId = textField.getText();
+            try {
+                ItemMusicCD.SongInfo song = MusicListManage.getQQSong(shareId);
+                if (song != null) {
+                    song.readOnly = readOnlyButton.isChecked();
+                    ClientNetWorkHandler.sendToServer(new SetMusicIDMessage(song));
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }else {
             this.tips = Text.translatable("gui.netmusic.cd_burner.music_id_error");

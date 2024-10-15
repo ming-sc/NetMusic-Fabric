@@ -2,7 +2,9 @@ package com.github.tartaricacid.netmusic.item;
 
 import com.github.tartaricacid.netmusic.api.pojo.NetEaseMusicList;
 import com.github.tartaricacid.netmusic.api.pojo.NetEaseMusicSong;
+import com.github.tartaricacid.netmusic.api.pojo.QQMusicSong;
 import com.github.tartaricacid.netmusic.constants.NetworkingConst;
+import com.github.tartaricacid.netmusic.constants.URLConst;
 import com.github.tartaricacid.netmusic.init.InitItems;
 import com.github.tartaricacid.netmusic.networking.message.MusicToClientMessage;
 import com.google.common.collect.Lists;
@@ -28,6 +30,7 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -161,6 +164,17 @@ public class ItemMusicCD extends Item {
             this.transName = track.getTransName();
             this.vip = track.needVip();
             this.artists = track.getArtists();
+        }
+
+        public SongInfo(QQMusicSong song) {
+            List<QQMusicSong.song> songList = song.getSongList();
+            if (songList != null && !songList.isEmpty()) {
+                QQMusicSong.song qqSong = songList.get(0);
+                this.songUrl = String.format(URLConst.QQ_MUSIC_URL, qqSong.getMid(), qqSong.getMid());
+                this.songName = qqSong.getName();
+                this.songTime = qqSong.getInterval();
+                this.artists = qqSong.getSinger();
+            }
         }
 
         public SongInfo(NbtCompound nbt) {

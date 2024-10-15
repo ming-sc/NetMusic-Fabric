@@ -88,6 +88,11 @@ public final class WebApi {
         return NetWorker.get(url, requestPropertyData);
     }
 
+    public String getQQMusicInfo(String shareId) throws IOException {
+        String url = "https://c6.y.qq.com/base/fcgi-bin/u?__=" + shareId;
+        return NetWorker.get(url, requestPropertyData);
+    }
+
     @Nullable
     public String getRedirectMusicUrl(long musicId) throws Exception {
         String url = String.format("https://music.163.com/song/media/outer/url?id=%d.mp3", musicId);

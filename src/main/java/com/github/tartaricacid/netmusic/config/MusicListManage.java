@@ -4,6 +4,7 @@ import com.github.tartaricacid.netmusic.NetMusic;
 import com.github.tartaricacid.netmusic.api.ExtraMusicList;
 import com.github.tartaricacid.netmusic.api.pojo.NetEaseMusicList;
 import com.github.tartaricacid.netmusic.api.pojo.NetEaseMusicSong;
+import com.github.tartaricacid.netmusic.api.pojo.QQMusicSong;
 import com.github.tartaricacid.netmusic.item.ItemMusicCD;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -27,6 +28,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author : IMG
@@ -38,6 +41,7 @@ public class MusicListManage implements SimpleSynchronousResourceReloadListener 
     private static final Path CONFIG_DIR = Paths.get("config").resolve("net_music");
     private static final Path CONFIG_FILE = CONFIG_DIR.resolve("music.json");
     public static List<ItemMusicCD.SongInfo> SONGS = Lists.newArrayList();
+    private static final Pattern QQ_MUSIC_RESULT_REG = Pattern.compile("window\\.__ssrFirstPageData__ =\\{(.*)}}");
 
     public static void loadConfigSongs(ResourceManager manager) throws IOException {
         if (!Files.isDirectory(CONFIG_DIR)){
@@ -94,6 +98,18 @@ public class MusicListManage implements SimpleSynchronousResourceReloadListener 
 
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         FileUtils.write(CONFIG_FILE.toFile(), gson.toJson(SONGS), StandardCharsets.UTF_8);
+    }
+
+    public static ItemMusicCD.SongInfo getQQSong(String shareId) throws IOException {
+        String result = NetMusic.NET_EASE_WEB_API.getQQMusicInfo(shareId);
+        Matcher matcher = QQ_MUSIC_RESULT_REG.matcher(result);
+        if (matcher.find()) {
+            // 去除掉 window.__ssrFirstPageData__ = 字符串
+            String json = "{" + matcher.group(1) + "}}";
+            System.out.println(json);
+            return new ItemMusicCD.SongInfo(GSON.fromJson(json, QQMusicSong.class));
+        }
+        return null;
     }
 
     @Override
