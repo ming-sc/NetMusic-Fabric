@@ -78,8 +78,14 @@ public class MusicPlayManager {
             }
 //            NetMusicSound netMusicSound = (NetMusicSound) sound.apply(urlFinal);
             MinecraftClient.getInstance().submit(() -> {
-                MinecraftClient.getInstance().getSoundManager().play(sound.apply(urlFinal));
-                setNowPlaying(Text.literal(songName));
+                NetMusicSound musicSound = (NetMusicSound) sound.apply(urlFinal);
+                CompletableFuture.completedFuture(null).thenCompose(unused -> {
+                    return musicSound.loadTrack(urlFinal);
+                }).whenComplete(((audioTrack, throwable) -> {
+                    musicSound.getPlayer().playTrack(audioTrack);
+                    MinecraftClient.getInstance().getSoundManager().play(musicSound);
+                    setNowPlaying(Text.literal(songName));
+                }));
 //                CompletableFuture<AudioTrack> future = CompletableFuture.completedFuture(null).thenCompose(unused -> {
 //                    return netMusicSound.loadTrack(urlFinal);
 //                }).whenComplete((track, e) -> {

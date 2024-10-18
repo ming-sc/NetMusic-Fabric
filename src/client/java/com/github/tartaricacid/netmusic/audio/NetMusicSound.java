@@ -86,23 +86,31 @@ public class NetMusicSound extends AbstractTickableSoundInstance {
 
     @Override
     public CompletableFuture<AudioStream> getAudioStream(SoundLoader soundBuffers, Identifier id, boolean looping) {
-        return CompletableFuture.completedFuture(null).thenCompose(unused -> {
-            return loadTrack(this.songUrl);
-        }).whenComplete((track, e) -> {
-            player.playTrack(track);
-            System.out.println("Play music: " + track);
-        }).thenCompose(unused -> {
+//        return CompletableFuture.completedFuture(null).thenCompose(unused -> {
+//            return loadTrack(this.songUrl);
+//        }).whenComplete((track, e) -> {
+//            player.playTrack(track);
+//            System.out.println("Play music: " + track);
+//        }).thenCompose(unused -> {
+//            try {
+//                return CompletableFuture.completedFuture(new LavaAudioStream(player));
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
+
+        return CompletableFuture.supplyAsync(() -> {
             try {
-                return CompletableFuture.completedFuture(new LavaAudioStream(player));
+                return new LavaAudioStream(player);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, Util.getMainWorkerExecutor());
 
 //        return CompletableFuture.supplyAsync(() -> {
 //            try {
 ////                return new Mp3AudioStream(this.songUrl);
-//
+//                return new LavaAudioStream(player);
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
