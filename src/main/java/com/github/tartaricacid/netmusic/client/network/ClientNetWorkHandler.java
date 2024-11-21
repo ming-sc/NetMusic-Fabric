@@ -1,4 +1,4 @@
-package com.github.tartaricacid.netmusic.network;
+package com.github.tartaricacid.netmusic.client.network;
 
 import com.github.tartaricacid.netmusic.networking.message.Message;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

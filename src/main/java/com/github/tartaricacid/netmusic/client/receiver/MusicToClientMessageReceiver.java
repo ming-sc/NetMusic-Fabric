@@ -1,7 +1,7 @@
-package com.github.tartaricacid.netmusic.receiver;
+package com.github.tartaricacid.netmusic.client.receiver;
 
-import com.github.tartaricacid.netmusic.audio.MusicPlayManager;
-import com.github.tartaricacid.netmusic.audio.NetMusicSound;
+import com.github.tartaricacid.netmusic.client.audio.MusicPlayManager;
+import com.github.tartaricacid.netmusic.client.audio.NetMusicSound;
 import com.github.tartaricacid.netmusic.networking.message.MusicToClientMessage;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;

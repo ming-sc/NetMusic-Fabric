@@ -1,38 +1,33 @@
-package com.github.tartaricacid.netmusic.renderer;
+package com.github.tartaricacid.netmusic.client.renderer;
 
 import com.github.tartaricacid.netmusic.NetMusic;
-import com.github.tartaricacid.netmusic.init.InitBlocks;
-import com.github.tartaricacid.netmusic.init.InitItems;
-import com.github.tartaricacid.netmusic.item.ItemMusicPlayer;
-import com.github.tartaricacid.netmusic.math.Axis;
-import com.github.tartaricacid.netmusic.model.ModelMusicPlayer;
+import com.github.tartaricacid.netmusic.client.model.ModelMusicPlayer;
 import com.github.tartaricacid.netmusic.tileentity.TileEntityMusicPlayer;
 import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3f;
 
 /**
  * @author : IMG
  * @create : 2024/10/4
  */
-public class MusicPlayerRenderer implements BlockEntityRenderer<TileEntityMusicPlayer> {
-    public static ModelMusicPlayer<?> MODEL;
-    public static final Identifier TEXTURE = Identifier.of(NetMusic.MOD_ID, "textures/block/music_player.png");
+public class MusicPlayerRenderer extends BlockEntityRenderer<TileEntityMusicPlayer> {
+    public static final ModelMusicPlayer MODEL = new ModelMusicPlayer();
+    public static final Identifier TEXTURE = new Identifier(NetMusic.MOD_ID, "textures/block/music_player.png");
     public static MusicPlayerRenderer instance;
 
-    public MusicPlayerRenderer(BlockEntityRendererFactory.Context ctx){
-        MODEL = new ModelMusicPlayer<>(ctx.getLayerModelPart(ModelMusicPlayer.LAYER));
+    public MusicPlayerRenderer(BlockEntityRenderDispatcher dispatcher) {
+        super(dispatcher);
         instance = this;
     }
 
@@ -57,16 +52,16 @@ public class MusicPlayerRenderer implements BlockEntityRenderer<TileEntityMusicP
             default:
                 break;
             case SOUTH:
-                matrixStack.multiply(Axis.YP.rotationDegrees(180));
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
                 break;
             case EAST:
-                matrixStack.multiply(Axis.YP.rotationDegrees(270));
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270));
                 break;
             case WEST:
-                matrixStack.multiply(Axis.YP.rotationDegrees(90));
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90));
                 break;
         }
-        matrixStack.multiply(Axis.ZP.rotationDegrees(180));
+        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180));
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(TEXTURE));
         MODEL.render(matrixStack, buffer, combinedLight, OverlayTexture.DEFAULT_UV, 1, 1, 1, 1);
         matrixStack.pop();

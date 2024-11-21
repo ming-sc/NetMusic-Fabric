@@ -14,10 +14,10 @@ import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
+import net.minecraftforge.api.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class NetMusic implements ModInitializer {
 	public static final String MOD_ID = "netmusic";
@@ -25,7 +25,7 @@ public class NetMusic implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	public static WebApi NET_EASE_WEB_API;
 
 	public static final ScreenHandlerType<CDBurnerMenu> CD_BURNER_MENU_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(new Identifier(MOD_ID, "cd_burner"), CDBurnerMenu::new);
@@ -47,6 +47,6 @@ public class NetMusic implements ModInitializer {
 		InitSounds.init();
 		CommandRegistry.registryCommand();
 		ReceiverRegistry.register();
-		GeneralConfig.INSTANCE.load();
+		ModLoadingContext.registerConfig(MOD_ID, ModConfig.Type.COMMON, GeneralConfig.init());
 	}
 }

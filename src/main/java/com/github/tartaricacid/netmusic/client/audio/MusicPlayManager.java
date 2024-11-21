@@ -1,4 +1,4 @@
-package com.github.tartaricacid.netmusic.audio;
+package com.github.tartaricacid.netmusic.client.audio;
 
 import com.github.tartaricacid.netmusic.NetMusic;
 import com.github.tartaricacid.netmusic.api.NetWorker;
@@ -6,7 +6,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
 import java.io.File;
@@ -53,7 +52,7 @@ public class MusicPlayManager {
             }
             MinecraftClient.getInstance().submit(() -> {
                 MinecraftClient.getInstance().getSoundManager().play(sound.apply(urlFinal));
-                setNowPlaying(Text.literal(songName));
+                setNowPlaying(Text.of(songName));
             });
         } catch (MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
@@ -61,8 +60,6 @@ public class MusicPlayManager {
     }
 
     private static void setNowPlaying(Text songName){
-        MutableText mutableText = Text.translatable("record.nowPlaying", new Object[]{songName});
-        MinecraftClient.getInstance().inGameHud.setOverlayMessage(mutableText, true);
-        MinecraftClient.getInstance().getNarratorManager().narrate(mutableText);
+        MinecraftClient.getInstance().inGameHud.setRecordPlayingOverlay(songName);
     }
 }

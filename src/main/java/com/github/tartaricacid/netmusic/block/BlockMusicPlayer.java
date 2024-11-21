@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -18,7 +18,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -29,8 +28,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEntityProvider {
 
-    public BlockMusicPlayer(Settings settings) {
-        super(Settings.create().sounds(BlockSoundGroup.WOOD).strength(0.5f));
+    public BlockMusicPlayer() {
+        super(Settings.of(Material.WOOD).sounds(BlockSoundGroup.WOOD).strength(0.5f));
         this.setDefaultState(this.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.SOUTH));
     }
 
@@ -41,18 +40,8 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new TileEntityMusicPlayer(pos, state);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return !world.isClient ? createTickerHelper(type, TileEntityMusicPlayer.TYPE, TileEntityMusicPlayer::tick) : null;
-    }
-
-    public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> entityType, BlockEntityType<E> type, BlockEntityTicker<? super E> ticker) {
-        return type == entityType ? (BlockEntityTicker<A>) ticker : null;
+    public BlockEntity createBlockEntity(BlockView world) {
+        return new TileEntityMusicPlayer();
     }
 
     @Override
@@ -68,7 +57,7 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction direction = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction direction = ctx.getPlayerFacing().getOpposite();
         return this.getDefaultState().with(Properties.HORIZONTAL_FACING, direction);
     }
 
@@ -79,10 +68,11 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
         }
 
         BlockEntity te = world.getBlockEntity(pos);
-        if (!(te instanceof TileEntityMusicPlayer musicPlayer)){
+        if (!(te instanceof TileEntityMusicPlayer)){
             return ActionResult.PASS;
         }
 
+        TileEntityMusicPlayer musicPlayer = (TileEntityMusicPlayer) te;
         ItemStack stack = musicPlayer.getStack(0);
         if (!stack.isEmpty()){
             if (musicPlayer.isPlay()){
@@ -101,12 +91,14 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
         }
         if (info.vip) {
             if (world.isClient){
-                player.sendMessage(Text.translatable("message.netmusic.music_player.need_vip").formatted(Formatting.RED), true);
+                player.sendMessage(new TranslatableText("message.netmusic.music_player.need_vip").formatted(Formatting.RED), true);
             }
             return ActionResult.FAIL;
         }
 
-        musicPlayer.setStack(0, heldStack.copyWithCount(1));
+        ItemStack copyStack = heldStack.copy();
+        copyStack.setCount(1);
+        musicPlayer.setStack(0, copyStack);
         if (!player.isCreative()){
             heldStack.decrement(1);
         }
@@ -119,7 +111,8 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         BlockEntity te = world.getBlockEntity(pos);
-        if (te instanceof TileEntityMusicPlayer musicPlayer){
+        if (te instanceof TileEntityMusicPlayer){
+            TileEntityMusicPlayer musicPlayer = (TileEntityMusicPlayer) te;
             ItemStack stack = musicPlayer.getStack(0);
             if (!stack.isEmpty()){
                 musicPlayer.setPlay(false);
@@ -139,7 +132,8 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof TileEntityMusicPlayer te){
+        if (blockEntity instanceof TileEntityMusicPlayer){
+            TileEntityMusicPlayer te = (TileEntityMusicPlayer) blockEntity;
             ItemStack stackInSlot = te.getStack(0);
             if (!stackInSlot.isEmpty()){
                 if (te.isPlay()){
@@ -158,7 +152,8 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
 
     private static void playerMusic(World world, BlockPos blockPos, boolean signal) {
         BlockEntity blockEntity = world.getBlockEntity(blockPos);
-        if (blockEntity instanceof TileEntityMusicPlayer player) {
+        if (blockEntity instanceof TileEntityMusicPlayer) {
+            TileEntityMusicPlayer player = (TileEntityMusicPlayer) blockEntity;
             if (signal != player.hasSignal()) {
                 if (signal) {
                     if (player.isPlay()){

@@ -1,25 +1,24 @@
-package com.github.tartaricacid.netmusic.gui;
+package com.github.tartaricacid.netmusic.client.gui;
 
 import com.github.tartaricacid.netmusic.NetMusic;
+import com.github.tartaricacid.netmusic.client.network.ClientNetWorkHandler;
 import com.github.tartaricacid.netmusic.inventory.ComputerMenu;
 import com.github.tartaricacid.netmusic.item.ItemMusicCD;
-import com.github.tartaricacid.netmusic.network.ClientNetWorkHandler;
-import com.github.tartaricacid.netmusic.networking.NetworkHandler;
 import com.github.tartaricacid.netmusic.networking.message.SetMusicIDMessage;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import oshi.util.Util;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -32,7 +31,7 @@ import java.util.regex.Pattern;
  * @create : 2024/10/11
  */
 public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
-    private static final Identifier BG = Identifier.of(NetMusic.MOD_ID, "textures/gui/computer.png");
+    private static final Identifier BG = new Identifier(NetMusic.MOD_ID, "textures/gui/computer.png");
     private static final Pattern URL_HTTP_REG = Pattern.compile("(http|ftp|https)://[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-.,@?^=%&:/~+#]*[\\w\\-@?^=%&/~+#])?");
     private static final Pattern URL_FILE_REG = Pattern.compile("^[a-zA-Z]:\\\\(?:[^\\\\/:*?\"<>|\\r\\n]+\\\\)*[^\\\\/:*?\"<>|\\r\\n]*$");
     private static final Pattern TIME_REG = Pattern.compile("^\\d+$");
@@ -40,7 +39,7 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
     private TextFieldWidget nameTextField;
     private TextFieldWidget timeTextField;
     private CheckboxWidget readOnlyButton;
-    private Text tips = Text.empty();
+    private Text tips = LiteralText.EMPTY;
 
     public ComputerMenuScreen(ComputerMenu handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -55,12 +54,16 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
         this.initNameEditBox();
         this.initTimeEditBox();
         this.readOnlyButton = new CheckboxWidget(x + 58, y + 55, 80, 20,
-                Text.translatable("gui.netmusic.cd_burner.read_only"), false);
-        this.addDrawableChild(readOnlyButton);
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.netmusic.cd_burner.craft"), button -> handleCraftButton())
-                        .position(x + 7, y + 78)
-                        .size(135, 18)
-                        .build());
+                new TranslatableText("gui.netmusic.cd_burner.read_only"), false);
+        this.addButton(readOnlyButton);
+        this.addButton(new ButtonWidget(
+                x + 7,
+                y + 77,
+                135,
+                20,
+                new TranslatableText("gui.netmusic.cd_burner.craft"),
+                button -> handleCraftButton()
+        ));
     }
 
     private void initUrlEditBox(){
@@ -70,14 +73,14 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
             perText = urlTextField.getText();
             focus = urlTextField.isFocused();
         }
-        urlTextField = new TextFieldWidget(textRenderer, x + 10, y + 18, 120, 16, Text.literal("Music URL Box"));
+        urlTextField = new TextFieldWidget(textRenderer, x + 10, y + 18, 120, 16, Text.of("Music URL Box"));
         urlTextField.setText(perText);
         urlTextField.setDrawsBackground(false);
         urlTextField.setMaxLength(32500);
         urlTextField.setEditableColor(0xF3EFE0);
-        urlTextField.setFocused(focus);
+        urlTextField.setTextFieldFocused(focus);
         urlTextField.setCursorToEnd();
-        this.addSelectableChild(urlTextField);
+        this.addChild(urlTextField);
     }
 
     private void initNameEditBox(){
@@ -87,14 +90,14 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
             preText = nameTextField.getText();
             focus = nameTextField.isFocused();
         }
-        nameTextField = new TextFieldWidget(textRenderer, x + 10, y + 39, 120, 16, Text.literal("Music Name Box"));
+        nameTextField = new TextFieldWidget(textRenderer, x + 10, y + 39, 120, 16, Text.of("Music Name Box"));
         nameTextField.setText(preText);
         nameTextField.setDrawsBackground(false);
         nameTextField.setMaxLength(256);
         nameTextField.setEditableColor(0xF3EFE0);
-        nameTextField.setFocused(focus);
+        nameTextField.setTextFieldFocused(focus);
         nameTextField.setCursorToEnd();
-        this.addSelectableChild(nameTextField);
+        this.addChild(nameTextField);
     }
 
     private void initTimeEditBox(){
@@ -104,47 +107,47 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
             preText = timeTextField.getText();
             focus = timeTextField.isFocused();
         }
-        timeTextField = new TextFieldWidget(textRenderer, x + 10, y + 61, 40, 16, Text.literal("Music Time Box"));
+        timeTextField = new TextFieldWidget(textRenderer, x + 10, y + 61, 40, 16, Text.of("Music Time Box"));
         timeTextField.setText(preText);
         timeTextField.setDrawsBackground(false);
         timeTextField.setMaxLength(5);
         timeTextField.setEditableColor(0xF3EFE0);
-        timeTextField.setFocused(focus);
+        timeTextField.setTextFieldFocused(focus);
         timeTextField.setCursorToEnd();
-        this.addSelectableChild(timeTextField);
+        this.addChild(timeTextField);
     }
 
     private void handleCraftButton(){
         ItemStack cd = getScreenHandler().getInput().getStack();
         if (cd.isEmpty()){
-            this.tips = Text.translatable("gui.netmusic.cd_burner.cd_is_empty");
+            this.tips = new TranslatableText("gui.netmusic.cd_burner.cd_is_empty");
             return;
         }
 
         ItemMusicCD.SongInfo songInfo = ItemMusicCD.getSongInfo(cd);
         if (songInfo != null && songInfo.readOnly) {
-            this.tips = Text.translatable("gui.netmusic.cd_burner.cd_read_only");
+            this.tips = new TranslatableText("gui.netmusic.cd_burner.cd_read_only");
             return;
         }
         // 参数判空与合法性检查
         String urlText = urlTextField.getText();
-        if (Util.isBlank(urlText)){
-            this.tips = Text.translatable("gui.netmusic.computer.url.empty");
+        if (StringUtils.isBlank(urlText)){
+            this.tips = new TranslatableText("gui.netmusic.computer.url.empty");
             return;
         }
         String nameText = nameTextField.getText();
-        if (Util.isBlank(nameText)){
-            this.tips = Text.translatable("gui.netmusic.computer.name.empty");
+        if (StringUtils.isBlank(nameText)){
+            this.tips = new TranslatableText("gui.netmusic.computer.name.empty");
             return;
         }
         String timeText = timeTextField.getText();
-        if (Util.isBlank(timeText)){
-            this.tips = Text.translatable("gui.netmusic.computer.time.empty");
+        if (StringUtils.isBlank(timeText)){
+            this.tips = new TranslatableText("gui.netmusic.computer.time.empty");
             return;
         }
 
         if (!TIME_REG.matcher(timeText).matches()){
-            this.tips = Text.translatable("gui.netmusic.computer.time.not_number");
+            this.tips = new TranslatableText("gui.netmusic.computer.time.not_number");
             return;
         }
         int time = Integer.parseInt(timeText);
@@ -156,7 +159,7 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
         if (URL_FILE_REG.matcher(urlText).matches()){
             File file = Paths.get(urlText).toFile();
             if (!file.isFile()) {
-                this.tips = Text.translatable("gui.netmusic.computer.url.local_file_error");
+                this.tips = new TranslatableText("gui.netmusic.computer.url.local_file_error");
                 return;
             }
             try {
@@ -168,36 +171,39 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
                 e.fillInStackTrace();
             }
         }
-        this.tips = Text.translatable("gui.netmusic.computer.url.error");
+        this.tips = new TranslatableText("gui.netmusic.computer.url.error");
     }
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+    }
+
+    @Override
+    protected void drawBackground(MatrixStack matrixStack, float delta, int mouseX, int mouseY) {
+        renderBackground(matrixStack);
         int posX = this.x;
         int posY = this.y;
-        context.drawTexture(BG, posX, posY, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        MinecraftClient.getInstance().getTextureManager().bindTexture(BG);
+        drawTexture(matrixStack, posX, posY, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
-        super.render(context, mouseX, mouseY, delta);
-        urlTextField.render(context, mouseX, mouseY, delta);
-        nameTextField.render(context, mouseX, mouseY, delta);
-        timeTextField.render(context, mouseX, mouseY, delta);
-        if (Util.isBlank(urlTextField.getText()) && !urlTextField.isFocused()) {
-            context.drawText(textRenderer, Text.translatable("gui.netmusic.computer.url.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 18, Formatting.GRAY.getColorValue(), false);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        urlTextField.render(matrices, mouseX, mouseY, delta);
+        nameTextField.render(matrices, mouseX, mouseY, delta);
+        timeTextField.render(matrices, mouseX, mouseY, delta);
+        if (StringUtils.isBlank(urlTextField.getText()) && !urlTextField.isFocused()) {
+            textRenderer.draw(matrices, new TranslatableText("gui.netmusic.computer.url.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 18, Formatting.GRAY.getColorValue());
         }
-        if (Util.isBlank(nameTextField.getText()) && !nameTextField.isFocused()) {
-            context.drawText(textRenderer, Text.translatable("gui.netmusic.computer.name.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 39, Formatting.GRAY.getColorValue(), false);
+        if (StringUtils.isBlank(nameTextField.getText()) && !nameTextField.isFocused()) {
+            textRenderer.draw(matrices, new TranslatableText("gui.netmusic.computer.name.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 39, Formatting.GRAY.getColorValue());
         }
-        if (Util.isBlank(timeTextField.getText()) && !timeTextField.isFocused()) {
-            context.drawText(textRenderer, Text.translatable("gui.netmusic.computer.time.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 61, Formatting.GRAY.getColorValue(), false);
+        if (StringUtils.isBlank(timeTextField.getText()) && !timeTextField.isFocused()) {
+            textRenderer.draw(matrices, new TranslatableText("gui.netmusic.computer.time.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 61, Formatting.GRAY.getColorValue());
         }
-        context.drawTextWrapped(textRenderer, tips, this.x + 8, this.y + 100, 162, 0xCF0000);
-        drawMouseoverTooltip(context, mouseX, mouseY);
+        textRenderer.drawTrimmed(tips, this.x + 8, this.y + 100, 162, 0xCF0000);
+        drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
@@ -212,7 +218,8 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
     }
 
     @Override
-    protected void handledScreenTick() {
+    public void tick() {
+        super.tick();
         this.urlTextField.tick();
         this.nameTextField.tick();
         this.timeTextField.tick();
@@ -222,10 +229,13 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.urlTextField.mouseClicked(mouseX, mouseY, button)) {
             this.setFocused(this.urlTextField);
+            this.nameTextField.setTextFieldFocused(false);
+            this.timeTextField.setTextFieldFocused(false);
             return true;
         }
         if (this.nameTextField.mouseClicked(mouseX, mouseY, button)) {
             this.setFocused(this.nameTextField);
+            this.timeTextField.setTextFieldFocused(false);
             return true;
         }
         if (this.timeTextField.mouseClicked(mouseX, mouseY, button)) {
@@ -240,7 +250,7 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
         if (keyCode == 256) {
             this.client.player.closeHandledScreen();
         }
-        if (client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+        if (client.options.keyInventory.matchesKey(keyCode, scanCode)) {
             if(urlTextField.isFocused() || nameTextField.isFocused() || timeTextField.isFocused()){
                 return true;
             }

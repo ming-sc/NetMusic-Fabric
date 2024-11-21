@@ -2,28 +2,19 @@ package com.github.tartaricacid.netmusic.item;
 
 import com.github.tartaricacid.netmusic.api.pojo.NetEaseMusicList;
 import com.github.tartaricacid.netmusic.api.pojo.NetEaseMusicSong;
-import com.github.tartaricacid.netmusic.constants.NetworkingConst;
 import com.github.tartaricacid.netmusic.init.InitItems;
-import com.github.tartaricacid.netmusic.networking.message.MusicToClientMessage;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.nbt.*;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Language;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -43,8 +34,8 @@ public class ItemMusicCD extends Item {
 
     public static SongInfo getSongInfo(ItemStack stack) {
         if (stack.getItem() == InitItems.MUSIC_CD) {
-            NbtCompound tag = stack.getOrCreateNbt();
-            if (tag != null && tag.contains(SONG_INFO_TAG, NbtElement.COMPOUND_TYPE)) {
+            NbtCompound tag = stack.getTag();
+            if (tag != null && tag.contains(SONG_INFO_TAG, new NbtCompound().getType())) {
                 NbtCompound infoTag = tag.getCompound(SONG_INFO_TAG);
                 return SongInfo.deserializeNBT(infoTag);
             }
@@ -54,11 +45,14 @@ public class ItemMusicCD extends Item {
 
     public static ItemStack setSongInfo(SongInfo info, ItemStack stack) {
         if (stack.getItem() == InitItems.MUSIC_CD) {
-            NbtCompound tag = stack.getOrCreateNbt();
+            NbtCompound tag = stack.getTag();
+            if (tag == null) {
+                tag = new NbtCompound();
+            }
             NbtCompound songInfoTag = new NbtCompound();
             SongInfo.serializeNBT(info, songInfoTag);
             tag.put(SONG_INFO_TAG, songInfoTag);
-            stack.setNbt(tag);
+            stack.setTag(tag);
         }
         return stack;
     }
@@ -72,10 +66,10 @@ public class ItemMusicCD extends Item {
                 name = name + " §4§l[VIP]";
             }
             if (info.readOnly){
-                MutableText readOnlyText = Text.translatable("tooltips.netmusic.cd.read_only").formatted(Formatting.YELLOW);
-                return Text.literal(name).append(Text.literal(" ")).append(readOnlyText);
+                MutableText readOnlyText = new TranslatableText("tooltips.netmusic.cd.read_only").formatted(Formatting.YELLOW);
+                return new LiteralText(name).append(StringUtils.SPACE).append(readOnlyText);
             }
-            return Text.literal(name);
+            return Text.of(name);
         }
         return super.getName(stack);
     }
@@ -98,17 +92,17 @@ public class ItemMusicCD extends Item {
         if (info != null){
             if (StringUtils.isNoneBlank(info.transName)){
                 String text = prefix + language.get("tooltips.netmusic.cd.trans_name") + delimiter + "§6" + info.transName;
-                tooltip.add(Text.literal(text));
+                tooltip.add(new LiteralText(text));
             }
             if (info.artists != null && !info.artists.isEmpty()){
                 String artistNames = StringUtils.join(info.artists, " | ");
                 String text = prefix + language.get("tooltips.netmusic.cd.artists") + delimiter + "§3" + artistNames;
-                tooltip.add(Text.literal(text));
+                tooltip.add(new LiteralText(text));
             }
             String text = prefix + language.get("tooltips.netmusic.cd.time") + delimiter + "§5" + getSongTime(info.songTime);
-            tooltip.add(Text.literal(text));
+            tooltip.add(new LiteralText(text));
         }else {
-            tooltip.add(Text.translatable("tooltips.netmusic.cd.empty").formatted(Formatting.RED));
+            tooltip.add(new TranslatableText("tooltips.netmusic.cd.empty").formatted(Formatting.RED));
         }
     }
 
@@ -167,17 +161,19 @@ public class ItemMusicCD extends Item {
             this.songUrl = nbt.getString("url");
             this.songName = nbt.getString("name");
             this.songTime = nbt.getInt("time");
-            if (nbt.contains("trans_name", NbtElement.STRING_TYPE)) {
+            if (nbt.contains("trans_name", NbtString.of("").getType())){
                 this.transName = nbt.getString("trans_name");
             }
-            if (nbt.contains("vip", NbtElement.BYTE_TYPE)) {
+            if (nbt.contains("vip", NbtByte.of((byte) 0).getType())) {
                 this.vip = nbt.getBoolean("vip");
             }
-            if (nbt.contains("read_only", NbtElement.BYTE_TYPE)) {
+            if (nbt.contains("read_only", NbtByte.of((byte) 0).getType())) {
                 this.readOnly = nbt.getBoolean("read_only");
             }
-            if (nbt.contains("artists", NbtElement.LIST_TYPE)) {
-                this.artists = nbt.getList("artists", 8).stream().map(NbtElement::asString).toList();
+            if (nbt.contains("artists", new NbtList().getType())) {
+                NbtList nbtList = nbt.getList("artists", 8);
+                this.artists = Lists.newArrayList();
+                nbtList.forEach(tag -> this.artists.add(tag.asString()));
             }
         }
 

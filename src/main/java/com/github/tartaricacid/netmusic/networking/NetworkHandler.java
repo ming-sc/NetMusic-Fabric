@@ -1,8 +1,6 @@
 package com.github.tartaricacid.netmusic.networking;
 
 import com.github.tartaricacid.netmusic.networking.message.Message;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,7 +20,7 @@ public class NetworkHandler {
             ServerWorld serverWorld = (ServerWorld) world;
 
             PacketByteBuf buffer = message.toBuffer();
-            serverWorld.getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(pos), false).stream()
+            serverWorld.getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(pos), false)
                     .filter(p -> p.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < 96 * 96)
                     .forEach(p -> ServerPlayNetworking.send(p, message.getPacketId(), buffer));
         }

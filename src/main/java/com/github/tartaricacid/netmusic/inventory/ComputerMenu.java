@@ -59,7 +59,7 @@ public class ComputerMenu extends ScreenHandler {
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack transferSlot(PlayerEntity player, int slot) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slotByIndex = this.slots.get(slot);
         if (slotByIndex != null && slotByIndex.hasStack()){
@@ -83,15 +83,15 @@ public class ComputerMenu extends ScreenHandler {
     }
 
     @Override
-    public void onClosed(PlayerEntity player) {
-        super.onClosed(player);
+    public void close(PlayerEntity player) {
+        super.close(player);
         giveItemToPlayer(player, input.getStack(), 0);
         giveItemToPlayer(player, output.getStack(), 1);
     }
 
     private static void giveItemToPlayer(PlayerEntity player, ItemStack stack, int preferredSlot) {
         if(!stack.isEmpty()){
-            if (!player.getInventory().insertStack(stack)){
+            if (!player.inventory.insertStack(stack)){
                 player.dropItem(stack, false);
             }
         }
@@ -100,7 +100,8 @@ public class ComputerMenu extends ScreenHandler {
     public void setSongInfo(ItemMusicCD.SongInfo songInfo) {
         this.songInfo = songInfo;
         if (!input.getStack().isEmpty() && output.getStack().isEmpty()) {
-            ItemStack itemStack = this.input.getStack().copyWithCount(1);
+            ItemStack itemStack = this.input.getStack().copy();
+            itemStack.setCount(1);
             this.input.getStack().decrement(1);
             ItemMusicCD.SongInfo rawSongInfo = ItemMusicCD.getSongInfo(itemStack);
             if (rawSongInfo == null || !rawSongInfo.readOnly) {

@@ -5,6 +5,7 @@ import com.github.tartaricacid.netmusic.inventory.MusicPlayerInv;
 import com.github.tartaricacid.netmusic.item.ItemMusicCD;
 import com.github.tartaricacid.netmusic.networking.NetworkHandler;
 import com.github.tartaricacid.netmusic.networking.message.MusicToClientMessage;
+import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -12,19 +13,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author : IMG
  * @create : 2024/10/4
  */
-public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv {
+public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv, Tickable, BlockEntityClientSerializable {
     public static final BlockEntityType<TileEntityMusicPlayer> TYPE = BlockEntityType.Builder.create(TileEntityMusicPlayer::new, InitBlocks.MUSIC_PLAYER).build(null);
     private static final String CD_ITEM_TAG = "ItemStackCD";
     private static final String IS_PLAY_TAG = "IsPlay";
@@ -36,8 +32,8 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
     private boolean hasSignal = false;
     private boolean isEmpty = true;
 
-    public TileEntityMusicPlayer(BlockPos blockPos, BlockState blockState) {
-        super(TYPE, blockPos, blockState);
+    public TileEntityMusicPlayer() {
+        super(TYPE);
     }
 
     @Override
@@ -53,6 +49,10 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
     @Override
     public ItemStack removeStack(int slot, int amount) {
         ItemStack result = Inventories.splitStack(getItems(), slot, amount);
+        if (items.get(0).isEmpty()) {
+            setPlay(false);
+            setCurrentTime(0);
+        }
         markDirty();
         return result;
     }
@@ -103,43 +103,34 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
         }
     }
 
-    public static void tick(World world, BlockPos blockPos, BlockState blockState, TileEntityMusicPlayer te){
-        te.tickTime();
-        if ((0 < te.getCurrentTime() && te.getCurrentTime() < 16 && te.getCurrentTime() % 5 == 0) || te.getStack(0).isEmpty()){
-            te.setPlay(false);
+    @Override
+    public void tick() {
+        this.tickTime();
+        if (0 < this.getCurrentTime() && this.getCurrentTime() < 16 && this.getCurrentTime() % 5 == 0) {
+            this.setPlay(false);
+            this.markDirty();
         }
-        te.markDirty();
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        Inventories.readNbt(nbt, items);
-        isPlay = nbt.getBoolean(IS_PLAY_TAG);
-        currentTime = nbt.getInt(CURRENT_TIME_TAG);
-        hasSignal = nbt.getBoolean(SIGNAL_TAG);
-        isEmpty = nbt.getBoolean("isEmpty");
+    public void fromTag(BlockState state, NbtCompound tag) {
+        super.fromTag(state, tag);
+        Inventories.readNbt(tag, items);
+        isPlay = tag.getBoolean(IS_PLAY_TAG);
+        currentTime = tag.getInt(CURRENT_TIME_TAG);
+        hasSignal = tag.getBoolean(SIGNAL_TAG);
+        isEmpty = tag.getBoolean("isEmpty");
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    public NbtCompound writeNbt(NbtCompound nbt) {
         Inventories.writeNbt(nbt, items);
         nbt.putBoolean(IS_PLAY_TAG, isPlay);
         nbt.putInt(CURRENT_TIME_TAG, currentTime);
         nbt.putBoolean(SIGNAL_TAG, hasSignal);
         nbt.putBoolean("isEmpty", isEmpty);
         super.writeNbt(nbt);
-    }
-
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        return createNbt();
-    }
-
-    @Nullable
-    @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
+        return nbt;
     }
 
     public boolean isPlay(){
@@ -148,7 +139,6 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
 
     public void setPlay(boolean play){
         isPlay = play;
-        markDirty();
     }
 
     public void setPlayToClient(ItemMusicCD.SongInfo info){
@@ -164,12 +154,24 @@ public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv
     public void markDirty() {
         super.markDirty();
         isEmpty = getStack(0).isEmpty();
-        BlockState state = world.getBlockState(pos);
-        world.updateListeners(pos, state, state, 0);
+        if (world != null) {
+            BlockState state = world.getBlockState(pos);
+            world.updateListeners(pos, state, state, 0);
+        }
     }
 
     @Override
     public boolean isEmpty() {
         return isEmpty;
+    }
+
+    @Override
+    public void fromClientTag(NbtCompound nbtCompound) {
+        fromTag(world.getBlockState(pos), nbtCompound);
+    }
+
+    @Override
+    public NbtCompound toClientTag(NbtCompound nbtCompound) {
+        return writeNbt(nbtCompound);
     }
 }

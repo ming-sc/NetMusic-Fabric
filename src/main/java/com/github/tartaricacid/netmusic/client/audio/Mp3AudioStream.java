@@ -1,4 +1,4 @@
-package com.github.tartaricacid.netmusic.audio;
+package com.github.tartaricacid.netmusic.client.audio;
 
 import com.github.tartaricacid.netmusic.config.GeneralConfig;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
@@ -21,25 +21,20 @@ public class Mp3AudioStream implements AudioStream {
     private int offset;
 
     public Mp3AudioStream(URL url) throws Exception{
-        try {
-            AudioInputStream originalInputStream = new MpegAudioFileReader().getAudioInputStream(url);
-            AudioFormat originalFormat = originalInputStream.getFormat();
-            AudioFormat targetFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, originalFormat.getSampleRate(), 16,
+        AudioInputStream originalInputStream = new MpegAudioFileReader().getAudioInputStream(url);
+        AudioFormat originalFormat = originalInputStream.getFormat();
+        AudioFormat targetFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, originalFormat.getSampleRate(), 16,
                     originalFormat.getChannels(), originalFormat.getChannels() * 2, originalFormat.getSampleRate(), false);
-            AudioInputStream targetInputStream = AudioSystem.getAudioInputStream(targetFormat, originalInputStream);
-            if (GeneralConfig.ENABLE_STEREO) {
-                targetFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, originalFormat.getSampleRate(), 16,
+        AudioInputStream targetInputStream = AudioSystem.getAudioInputStream(targetFormat, originalInputStream);
+        if (GeneralConfig.ENABLE_STEREO.get()) {
+            targetFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, originalFormat.getSampleRate(), 16,
                         1, 2, originalFormat.getSampleRate(), false);
-                this.stream = AudioSystem.getAudioInputStream(targetFormat, targetInputStream);
-            } else {
-                this.stream = targetInputStream;
-            }
-            this.array = IOUtils.toByteArray(stream);
-            this.offset = 0;
-        }catch (Exception e){
-            e.printStackTrace();
-            throw e;
+            this.stream = AudioSystem.getAudioInputStream(targetFormat, targetInputStream);
+        } else {
+            this.stream = targetInputStream;
         }
+        this.array = IOUtils.toByteArray(stream);
+        this.offset = 0;
     }
 
     @Override

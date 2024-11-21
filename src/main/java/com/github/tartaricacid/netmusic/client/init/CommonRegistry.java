@@ -1,12 +1,12 @@
-package com.github.tartaricacid.netmusic.init;
+package com.github.tartaricacid.netmusic.client.init;
 
 import com.github.tartaricacid.netmusic.NetMusic;
+import com.github.tartaricacid.netmusic.client.gui.CDBurnerMenuScreen;
+import com.github.tartaricacid.netmusic.client.gui.ComputerMenuScreen;
+import com.github.tartaricacid.netmusic.client.receiver.GetMusicListMessageReceiver;
+import com.github.tartaricacid.netmusic.client.receiver.MusicToClientMessageReceiver;
 import com.github.tartaricacid.netmusic.constants.NetworkingConst;
-import com.github.tartaricacid.netmusic.gui.CDBurnerMenuScreen;
-import com.github.tartaricacid.netmusic.gui.ComputerMenuScreen;
-import com.github.tartaricacid.netmusic.networking.message.GetMusicListMessage;
-import com.github.tartaricacid.netmusic.receiver.GetMusicListMessageReceiver;
-import com.github.tartaricacid.netmusic.receiver.MusicToClientMessageReceiver;
+import com.github.tartaricacid.netmusic.init.InitBlocks;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;

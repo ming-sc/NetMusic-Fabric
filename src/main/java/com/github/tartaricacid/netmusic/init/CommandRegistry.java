@@ -1,7 +1,7 @@
 package com.github.tartaricacid.netmusic.init;
 
 import com.github.tartaricacid.netmusic.command.NetMusicCommand;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 
 /**
  * @author : IMG
@@ -11,9 +11,8 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 public class CommandRegistry {
 
     public static void registryCommand(){
-        CommandRegistrationCallback.EVENT.register((
-                (dispatcher, registryAccess, environment) -> {
+        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess) -> {
                     dispatcher.register(NetMusicCommand.get());
-                }));
+        }));
     }
 }

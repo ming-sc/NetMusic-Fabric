@@ -1,4 +1,4 @@
-package com.github.tartaricacid.netmusic.renderer;
+package com.github.tartaricacid.netmusic.client.renderer;
 
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;

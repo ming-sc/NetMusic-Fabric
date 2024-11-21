@@ -3,9 +3,8 @@ package com.github.tartaricacid.netmusic.init;
 import com.github.tartaricacid.netmusic.NetMusic;
 import com.github.tartaricacid.netmusic.tileentity.TileEntityMusicPlayer;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 /**
  * @author : IMG
@@ -19,7 +18,7 @@ public class InitBlockEntity {
     );
 
     public static final <T extends BlockEntityType<?>> T register(String name, T blockEntityType) {
-        return Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(NetMusic.MOD_ID, name), blockEntityType);
+        return Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(NetMusic.MOD_ID, name), blockEntityType);
     }
 
     public static void init(){

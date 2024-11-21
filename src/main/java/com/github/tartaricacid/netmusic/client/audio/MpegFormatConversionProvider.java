@@ -21,7 +21,7 @@
  * --------------------------------------------------------------------------
  */
 
-package com.github.tartaricacid.netmusic.audio;
+package com.github.tartaricacid.netmusic.client.audio;
 
 import javazoom.spi.mpeg.sampled.convert.DecodedMpegAudioInputStream;
 import javazoom.spi.mpeg.sampled.file.MpegEncoding;

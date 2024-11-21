@@ -1,10 +1,6 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
-	id 'maven-publish'
-	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 }
-
-//apply plugin: 'com.github.johnrengelman.shadow'
 
 version = project.mod_version
 group = project.maven_group
@@ -24,11 +20,6 @@ allprojects {
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
 	maven {
 		// location of the maven that hosts JEI files since January 2023
 		// Patchouli
@@ -51,17 +42,14 @@ repositories {
 		name 'Xander Maven'
 		url 'https://maven.isxander.dev/releases'
 	}
+	maven {
+		name = "Fuzs Mod Resources"
+		url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+	}
+	mavenCentral()
 }
 
 loom {
-	splitEnvironmentSourceSets()
-
-	mods {
-		"netmusic" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
 
 }
 
@@ -77,8 +65,9 @@ dependencies {
 	implementation include("com.googlecode.soundlibs:jlayer:1.0.1.4")
 	implementation include("com.googlecode.soundlibs:tritonus-share:0.3.7.4")
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation include("dev.isxander:yet-another-config-lib:3.5.0+1.20.1-fabric")
-	// Fabric API. This is technically optional, but you probably want it anyway.
+	implementation include("com.electronwill.night-config:core:3.6.5")
+	modImplementation ("net.minecraftforge:forgeconfigapiport-fabric:${forge_config_api_port_version}")
+	// Fabric API.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
@@ -91,54 +80,18 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
+	it.options.release = 8
 }
 
-//shadowJar{
-//	dependencies {
-//		include(dependency("com.googlecode.soundlibs:mp3spi:1.9.5.4"))
-//		include(dependency("com.googlecode.soundlibs:jlayer:1.0.1.4"))
-//		include(dependency("com.googlecode.soundlibs:tritonus-share:0.3.7.4"))
-//		include(dependency("dev.isxander:yet-another-config-lib:3.5.0+1.20.1-fabric"))
-//	}
-//
-//	relocate 'javazoom.jl', 'com.github.tartaricacid.netmusic.soundlibs.javazoom.jl'
-//	relocate 'javazoom.spi', 'com.github.tartaricacid.netmusic.soundlibs.javazoom.spi'
-//	relocate 'org.tritonus', 'com.github.tartaricacid.netmusic.soundlibs.org.tritonus'
-//
-//	mergeServiceFiles()
-//}
-
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			artifactId = project.archives_base_name
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
 	}
 }
