@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEntityProvider {
 
     public BlockMusicPlayer(Settings settings) {
-        super(Settings.create().sounds(BlockSoundGroup.WOOD).strength(0.5f));
+        super(Settings.of(Material.WOOD).sounds(BlockSoundGroup.WOOD).strength(0.5f));
         this.setDefaultState(this.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.SOUTH));
     }
 
@@ -69,7 +69,7 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction direction = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction direction = ctx.getPlayerFacing().getOpposite();
         return this.getDefaultState().with(Properties.HORIZONTAL_FACING, direction);
     }
 
@@ -102,12 +102,14 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
         }
         if (info.vip) {
             if (world.isClient) {
-                player.sendMessage(Text.translatable("message.netmusic.music_player.need_vip").formatted(Formatting.RED), true);
+                player.sendMessage(new TranslatableText("message.netmusic.music_player.need_vip").formatted(Formatting.RED), true);
             }
             return ActionResult.FAIL;
         }
 
-        musicPlayer.setStack(0, heldStack.copyWithCount(1));
+        ItemStack copyStack = heldStack.copy();
+        copyStack.setCount(1);
+        musicPlayer.setStack(0, copyStack);
         if (!player.isCreative()) {
             heldStack.decrement(1);
         }

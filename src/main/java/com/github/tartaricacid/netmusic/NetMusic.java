@@ -13,6 +13,8 @@ import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.api.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,6 @@ public class NetMusic implements ModInitializer {
 
     public static final ScreenHandlerType<CDBurnerMenu> CD_BURNER_MENU_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(new Identifier(MOD_ID, "cd_burner"), CDBurnerMenu::new);
     public static final ScreenHandlerType<ComputerMenu> COMPUTER_MENU_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(new Identifier(MOD_ID, "computer"), ComputerMenu::new);
-
     @Override
     public void onInitialize() {
         // This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -44,6 +45,6 @@ public class NetMusic implements ModInitializer {
         InitSounds.init();
         CommandRegistry.registryCommand();
         ReceiverRegistry.register();
-        GeneralConfig.INSTANCE.load();
+        ModLoadingContext.registerConfig(MOD_ID, ModConfig.Type.COMMON, GeneralConfig.init());
     }
 }

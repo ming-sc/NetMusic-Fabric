@@ -29,7 +29,7 @@ public class Mp3AudioStream implements AudioStream {
         AudioFormat targetFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, originalFormat.getSampleRate(), 16,
                 originalFormat.getChannels(), originalFormat.getChannels() * 2, originalFormat.getSampleRate(), false);
         AudioInputStream targetInputStream = AudioSystem.getAudioInputStream(targetFormat, originalInputStream);
-        if (GeneralConfig.ENABLE_STEREO) {
+        if (GeneralConfig.ENABLE_STEREO.get()) {
             targetFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, originalFormat.getSampleRate(), 16,
                     1, 2, originalFormat.getSampleRate(), false);
             this.stream = AudioSystem.getAudioInputStream(targetFormat, targetInputStream);

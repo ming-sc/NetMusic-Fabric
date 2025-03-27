@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
  * @create : 2024/10/4
  */
 public class ModelMusicPlayer<T extends Entity> extends EntityModel<T> {
-    public static final EntityModelLayer LAYER = new EntityModelLayer(Identifier.of(NetMusic.MOD_ID, "main"), "musicplayer");
+    public static final EntityModelLayer LAYER = new EntityModelLayer(new Identifier(NetMusic.MOD_ID, "main"), "musicplayer");
     private final ModelPart laba;
     private final ModelPart tube;
     private final ModelPart wheel;

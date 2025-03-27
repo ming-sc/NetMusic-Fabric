@@ -1,10 +1,7 @@
 package com.github.tartaricacid.netmusic.block;
 
 import com.github.tartaricacid.netmusic.inventory.ComputerMenu;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -14,7 +11,9 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -41,7 +40,7 @@ public class BlockComputer extends HorizontalFacingBlock {
     protected static final VoxelShape WEST_AABB = rotateShape(Direction.NORTH, Direction.EAST, NORTH_AABB);
 
     public BlockComputer(Settings settings) {
-        super(Settings.create().sounds(BlockSoundGroup.WOOD).strength(0.5f));
+        super(Settings.of(Material.WOOD).sounds(BlockSoundGroup.WOOD).strength(0.5f));
         this.setDefaultState(this.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
@@ -91,7 +90,7 @@ public class BlockComputer extends HorizontalFacingBlock {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction direction = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction direction = ctx.getPlayerFacing().getOpposite();
         return this.getDefaultState().with(FACING, direction);
     }
 
@@ -109,12 +108,12 @@ public class BlockComputer extends HorizontalFacingBlock {
     @Nullable
     @Override
     public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
-        return new SimpleNamedScreenHandlerFactory((id, inventory, player) -> new ComputerMenu(id, inventory), Text.empty());
+        return new SimpleNamedScreenHandlerFactory((id, inventory, player) -> new ComputerMenu(id, inventory), LiteralText.EMPTY);
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
-        tooltip.add(Text.translatable("block.netmusic.computer.web_link.desc").formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("block.netmusic.computer.local_file.desc").formatted(Formatting.GRAY));
+        tooltip.add(new TranslatableText("block.netmusic.computer.web_link.desc").formatted(Formatting.GRAY));
+        tooltip.add(new TranslatableText("block.netmusic.computer.local_file.desc").formatted(Formatting.GRAY));
     }
 }

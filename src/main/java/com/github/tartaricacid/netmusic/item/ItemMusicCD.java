@@ -12,8 +12,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Language;
 import net.minecraft.world.World;
@@ -64,10 +66,10 @@ public class ItemMusicCD extends Item {
                 name = name + " §4§l[VIP]";
             }
             if (info.readOnly) {
-                MutableText readOnlyText = Text.translatable("tooltips.netmusic.cd.read_only").formatted(Formatting.YELLOW);
-                return Text.literal(name).append(Text.literal(" ")).append(readOnlyText);
+                MutableText readOnlyText = new TranslatableText("tooltips.netmusic.cd.read_only").formatted(Formatting.YELLOW);
+                return new LiteralText(name).append(new LiteralText(" ")).append(readOnlyText);
             }
-            return Text.literal(name);
+            return new LiteralText(name);
         }
         return super.getName(stack);
     }
@@ -90,17 +92,17 @@ public class ItemMusicCD extends Item {
         if (info != null) {
             if (StringUtils.isNoneBlank(info.transName)) {
                 String text = prefix + language.get("tooltips.netmusic.cd.trans_name") + delimiter + "§6" + info.transName;
-                tooltip.add(Text.literal(text));
+                tooltip.add(new LiteralText(text));
             }
             if (info.artists != null && !info.artists.isEmpty()) {
                 String artistNames = StringUtils.join(info.artists, " | ");
                 String text = prefix + language.get("tooltips.netmusic.cd.artists") + delimiter + "§3" + artistNames;
-                tooltip.add(Text.literal(text));
+                tooltip.add(new LiteralText(text));
             }
             String text = prefix + language.get("tooltips.netmusic.cd.time") + delimiter + "§5" + getSongTime(info.songTime);
-            tooltip.add(Text.literal(text));
+            tooltip.add(new LiteralText(text));
         } else {
-            tooltip.add(Text.translatable("tooltips.netmusic.cd.empty").formatted(Formatting.RED));
+            tooltip.add(new TranslatableText("tooltips.netmusic.cd.empty").formatted(Formatting.RED));
         }
     }
 

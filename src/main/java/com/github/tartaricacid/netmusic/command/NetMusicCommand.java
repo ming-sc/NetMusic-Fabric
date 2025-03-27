@@ -16,7 +16,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -52,7 +52,7 @@ public class NetMusicCommand {
             long songId = LongArgumentType.getLong(context, SONG_ID);
             ItemMusicCD.SongInfo songInfo = MusicListManage.get163Song(songId);
             ItemStack musicDisc = ItemMusicCD.setSongInfo(songInfo, InitItems.MUSIC_CD.getDefaultStack());
-            ServerPlayerEntity serverPlayer = context.getSource().getPlayerOrThrow();
+            ServerPlayerEntity serverPlayer = context.getSource().getPlayer();
             boolean canPlaceIn = serverPlayer.getInventory().insertStack(musicDisc);
             if (canPlaceIn && musicDisc.isEmpty()) {
                 musicDisc.setCount(1);
@@ -70,10 +70,10 @@ public class NetMusicCommand {
                     dropItem.setThrower(serverPlayer.getUuid());
                 }
             }
-            context.getSource().sendFeedback(() -> Text.translatable("command.netmusic.music_cd.add163cd.success"), false);
+            context.getSource().sendFeedback(new TranslatableText("command.netmusic.music_cd.add163cd.success"), false);
         } catch (Exception e) {
             e.printStackTrace();
-            context.getSource().sendError(Text.translatable("command.netmusic.music_cd.add163cd.fail"));
+            context.getSource().sendError(new TranslatableText("command.netmusic.music_cd.add163cd.fail"));
         }
         return Command.SINGLE_SUCCESS;
     }
@@ -81,7 +81,7 @@ public class NetMusicCommand {
     private static int getSongList(CommandContext<ServerCommandSource> context) {
         try {
             long listId = LongArgumentType.getLong(context, SONG_LIST_ID);
-            ServerPlayerEntity serverPlayer = context.getSource().getPlayerOrThrow();
+            ServerPlayerEntity serverPlayer = context.getSource().getPlayer();
             NetworkHandler.sendToClientPlayer(new GetMusicListMessage(listId), serverPlayer);
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,7 +91,7 @@ public class NetMusicCommand {
 
     private static int reload(CommandContext<ServerCommandSource> context) {
         try {
-            ServerPlayerEntity serverPlayer = context.getSource().getPlayerOrThrow();
+            ServerPlayerEntity serverPlayer = context.getSource().getPlayer();
             NetworkHandler.sendToClientPlayer(new GetMusicListMessage(GetMusicListMessage.RELOAD_MESSAGE), serverPlayer);
         } catch (Exception e) {
             e.printStackTrace();

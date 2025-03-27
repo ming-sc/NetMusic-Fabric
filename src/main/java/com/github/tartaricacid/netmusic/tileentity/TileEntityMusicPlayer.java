@@ -5,6 +5,7 @@ import com.github.tartaricacid.netmusic.inventory.MusicPlayerInv;
 import com.github.tartaricacid.netmusic.item.ItemMusicCD;
 import com.github.tartaricacid.netmusic.networking.NetworkHandler;
 import com.github.tartaricacid.netmusic.networking.message.MusicToClientMessage;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -13,7 +14,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * @create : 2024/10/4
  */
 public class TileEntityMusicPlayer extends BlockEntity implements MusicPlayerInv {
-    public static final BlockEntityType<TileEntityMusicPlayer> TYPE = BlockEntityType.Builder.create(TileEntityMusicPlayer::new, InitBlocks.MUSIC_PLAYER).build(null);
+    public static final BlockEntityType<TileEntityMusicPlayer> TYPE = FabricBlockEntityTypeBuilder.create(TileEntityMusicPlayer::new, InitBlocks.MUSIC_PLAYER).build(null);
     private static final String CD_ITEM_TAG = "ItemStackCD";
     private static final String IS_PLAY_TAG = "IsPlay";
     private static final String CURRENT_TIME_TAG = "CurrentTime";

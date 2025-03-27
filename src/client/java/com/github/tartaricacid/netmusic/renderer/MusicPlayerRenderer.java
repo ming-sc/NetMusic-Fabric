@@ -1,7 +1,6 @@
 package com.github.tartaricacid.netmusic.renderer;
 
 import com.github.tartaricacid.netmusic.NetMusic;
-import com.github.tartaricacid.netmusic.math.Axis;
 import com.github.tartaricacid.netmusic.model.ModelMusicPlayer;
 import com.github.tartaricacid.netmusic.tileentity.TileEntityMusicPlayer;
 import net.minecraft.block.HorizontalFacingBlock;
@@ -16,6 +15,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3f;
 
 /**
  * @author : IMG
@@ -23,7 +23,7 @@ import net.minecraft.util.math.Direction;
  */
 public class MusicPlayerRenderer implements BlockEntityRenderer<TileEntityMusicPlayer> {
     public static ModelMusicPlayer<?> MODEL;
-    public static final Identifier TEXTURE = Identifier.of(NetMusic.MOD_ID, "textures/block/music_player.png");
+    public static final Identifier TEXTURE = new Identifier(NetMusic.MOD_ID, "textures/block/music_player.png");
     public static MusicPlayerRenderer instance;
 
     public MusicPlayerRenderer(BlockEntityRendererFactory.Context ctx) {
@@ -47,21 +47,21 @@ public class MusicPlayerRenderer implements BlockEntityRenderer<TileEntityMusicP
         matrixStack.push();
         matrixStack.scale(0.75f, 0.75f, 0.75f);
         matrixStack.translate(0.5 / 0.75, 1.5, 0.5 / 0.75);
-        switch (facing) {
+        switch (facing){
             case NORTH:
             default:
                 break;
             case SOUTH:
-                matrixStack.multiply(Axis.YP.rotationDegrees(180));
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
                 break;
             case EAST:
-                matrixStack.multiply(Axis.YP.rotationDegrees(270));
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270));
                 break;
             case WEST:
-                matrixStack.multiply(Axis.YP.rotationDegrees(90));
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90));
                 break;
         }
-        matrixStack.multiply(Axis.ZP.rotationDegrees(180));
+        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180));
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(TEXTURE));
         MODEL.render(matrixStack, buffer, combinedLight, OverlayTexture.DEFAULT_UV, 1, 1, 1, 1);
         matrixStack.pop();

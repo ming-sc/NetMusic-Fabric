@@ -4,31 +4,25 @@ import com.github.tartaricacid.netmusic.init.InitSounds;
 import com.github.tartaricacid.netmusic.tileentity.TileEntityMusicPlayer;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.sound.AudioStream;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.client.sound.SoundLoader;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 
 import java.net.URL;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author : IMG
  * @create : 2024/10/2
  */
-public class NetMusicSound extends AbstractTickableSoundInstance {
+public class NetMusicSound extends AbstractTickableSoundInstance implements IUrlSound {
     private final URL songUrl;
     private final int tickTimes;
     private final BlockPos pos;
     private int tick;
 
     public NetMusicSound(BlockPos pos, URL songUrl, int timeSecond) {
-        super(InitSounds.NET_MUSIC, SoundCategory.RECORDS, SoundInstance.createRandom());
+        super(InitSounds.NET_MUSIC, SoundCategory.RECORDS);
         this.songUrl = songUrl;
         this.x = pos.getX() + 0.5f;
         this.y = pos.getY() + 0.5f;
@@ -72,15 +66,7 @@ public class NetMusicSound extends AbstractTickableSoundInstance {
     }
 
     @Override
-    public CompletableFuture<AudioStream> getAudioStream(SoundLoader soundBuffers, Identifier id, boolean looping) {
-
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return new Mp3AudioStream(this.songUrl);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }, Util.getMainWorkerExecutor());
+    public URL getSongUrl() {
+        return songUrl;
     }
 }

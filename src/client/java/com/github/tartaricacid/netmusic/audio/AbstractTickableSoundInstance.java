@@ -4,7 +4,6 @@ import net.minecraft.client.sound.AbstractSoundInstance;
 import net.minecraft.client.sound.TickableSoundInstance;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.random.Random;
 
 /**
  * @author : IMG
@@ -14,8 +13,8 @@ import net.minecraft.util.math.random.Random;
 public abstract class AbstractTickableSoundInstance extends AbstractSoundInstance implements TickableSoundInstance {
     private boolean stopped;
 
-    protected AbstractTickableSoundInstance(SoundEvent p_235076_, SoundCategory p_235077_, Random p_235078_) {
-        super(p_235076_, p_235077_, p_235078_);
+    protected AbstractTickableSoundInstance(SoundEvent p_235076_, SoundCategory p_235077_) {
+        super(p_235076_, p_235077_);
     }
 
     @Override

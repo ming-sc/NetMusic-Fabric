@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author : IMG
@@ -48,10 +47,8 @@ public class MusicListManage implements SimpleSynchronousResourceReloadListener 
             stream = Files.newInputStream(file.toPath());
         } else {
             Identifier res = new Identifier(NetMusic.MOD_ID, "music.json");
-            Optional<Resource> optional = manager.getResource(res);
-            if (optional.isPresent()) {
-                stream = optional.get().getInputStream();
-            }
+            Resource resource = manager.getResource(res);
+            stream = resource.getInputStream();
         }
         if (stream != null) {
             SONGS = GSON.fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8),

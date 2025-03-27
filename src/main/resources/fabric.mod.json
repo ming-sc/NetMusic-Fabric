@@ -25,18 +25,22 @@
     ],
     "client": [
       "com.github.tartaricacid.netmusic.NetMusicClient"
-    ],
-    "fabric-datagen": [
-      "com.github.tartaricacid.netmusic.NetMusicDataGenerator"
     ]
   },
   "depends": {
-    "fabricloader": ">=0.16.5",
-    "minecraft": "~1.20.1",
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.18.2",
     "java": ">=17",
-    "fabric-api": "*"
+    "fabric-api": "*",
+    "forgeconfigapiport": ">=3.2.4"
   },
   "suggests": {
     "another-mod": "*"
-  }
+  },
+  "mixins": [
+    {
+      "config": "netmusic.client.mixins.json",
+      "environment": "client"
+    }
+  ]
 }

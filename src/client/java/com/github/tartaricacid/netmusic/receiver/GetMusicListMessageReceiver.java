@@ -7,8 +7,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -27,17 +28,17 @@ public class GetMusicListMessageReceiver {
                     if (message.getMusicListId() == GetMusicListMessage.RELOAD_MESSAGE) {
                         MusicListManage.loadConfigSongs(MinecraftClient.getInstance().getResourceManager());
                         if (player != null) {
-                            player.sendMessage(Text.translatable("command.netmusic.music_cd.reload.success"));
+                            player.sendSystemMessage(new TranslatableText("command.netmusic.music_cd.reload.success"), Util.NIL_UUID);
                         }
                     } else {
                         MusicListManage.add163List(message.getMusicListId());
                         if (player != null) {
-                            player.sendMessage(Text.translatable("command.netmusic.music_cd.add163.success"));
+                            player.sendSystemMessage(new TranslatableText("command.netmusic.music_cd.add163.success"), Util.NIL_UUID);
                         }
                     }
                 } catch (Exception e) {
                     if (player != null) {
-                        player.sendMessage(Text.translatable("command.netmusic.music_cd.add163.fail").formatted(Formatting.RED));
+                        player.sendSystemMessage(new TranslatableText("command.netmusic.music_cd.add163.fail").formatted(Formatting.RED), Util.NIL_UUID);
                     }
                     e.printStackTrace();
                 }

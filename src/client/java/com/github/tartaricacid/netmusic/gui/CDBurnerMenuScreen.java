@@ -8,18 +8,19 @@ import com.github.tartaricacid.netmusic.network.ClientNetWorkHandler;
 import com.github.tartaricacid.netmusic.networking.message.SetMusicIDMessage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
@@ -30,13 +31,13 @@ import java.util.regex.Pattern;
  * @create : 2024/10/7
  */
 public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
-    private static final Identifier BG = Identifier.of(NetMusic.MOD_ID, "textures/gui/cd_burner.png");
+    private static final Identifier BG = new Identifier(NetMusic.MOD_ID, "textures/gui/cd_burner.png");
     private static final Pattern ID_REG = Pattern.compile("^\\d{4,}$");
     private static final Pattern URL_1_REG = Pattern.compile("^https://music\\.163\\.com/song\\?id=(\\d+).*$");
     private static final Pattern URL_2_REG = Pattern.compile("^https://music\\.163\\.com/#/song\\?id=(\\d+).*$");
     private TextFieldWidget textField;
     private CheckboxWidget readOnlyButton;
-    private Text tips = Text.empty();
+    private Text tips = LiteralText.EMPTY;
 
     public CDBurnerMenuScreen(CDBurnerMenu handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -54,7 +55,7 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
             perText = textField.getText();
             focus = textField.isFocused();
         }
-        textField = new TextFieldWidget(client.textRenderer, x + 12, y + 18, 132, 16, Text.empty()) {
+        textField = new TextFieldWidget(client.textRenderer, x + 12, y + 18, 132, 16, LiteralText.EMPTY) {
             @Override
             public void write(String text) {
                 Matcher matcher1 = URL_1_REG.matcher(text);
@@ -79,39 +80,37 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
         textField.setDrawsBackground(false);
         textField.setMaxLength(19);
         textField.setEditableColor(0xF3EFE0);
-        textField.setFocused(focus);
+        textField.setTextFieldFocused(focus);
         textField.setCursorToEnd();
         this.addSelectableChild(textField);
 
-        this.readOnlyButton = new CheckboxWidget(x + 66, y + 34, 80, 20, Text.translatable("gui.netmusic.cd_burner.read_only"), false);
+        this.readOnlyButton = new CheckboxWidget(x + 66, y + 34, 80, 20, new TranslatableText("gui.netmusic.cd_burner.read_only"), false);
         this.addDrawableChild(readOnlyButton);
         this.addDrawableChild(
-                ButtonWidget.builder(Text.translatable("gui.netmusic.cd_burner.craft"), button -> handleCraftButton())
-                        .position(x + 7, y + 35)
-                        .size(55, 18)
-                        .build()
+                new ButtonWidget(x + 7, y + 34, 55, 20, new TranslatableText("gui.netmusic.cd_burner.craft"), button -> handleCraftButton())
         );
     }
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+        renderBackground(matrices);
         int posX = this.x;
         int posY = this.y;
-        context.drawTexture(BG, posX, posY, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, BG);
+        drawTexture(matrices, posX, posY, 0, 0, backgroundWidth, backgroundHeight);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
-        super.render(context, mouseX, mouseY, delta);
-        textField.render(context, mouseX, mouseY, delta);
-        if (Util.isBlank(textField.getText()) && !textField.isFocused()) {
-            context.drawText(textRenderer, Text.translatable("gui.netmusic.cd_burner.id.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 18, Formatting.GRAY.getColorValue(), false);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        textField.render(matrices, mouseX, mouseY, delta);
+        if (StringUtils.isBlank(textField.getText()) && !textField.isFocused()) {
+            drawTextWithShadow(matrices, textRenderer, new TranslatableText("gui.netmusic.cd_burner.id.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 18, Formatting.GRAY.getColorValue());
         }
-        context.drawTextWrapped(textRenderer, tips, this.x + 8, this.y + 57, 135, 0xCF0000);
-        this.drawMouseoverTooltip(context, mouseX, mouseY);
+        textRenderer.drawTrimmed(tips, this.x + 8, this.y + 57, 135, 0xCF0000);
+        drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
@@ -159,16 +158,16 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
     private void handleCraftButton() {
         ItemStack cd = getScreenHandler().getInput().getStack();
         if (cd.isEmpty()) {
-            this.tips = Text.translatable("gui.netmusic.cd_burner.cd_is_empty");
+            this.tips = new TranslatableText("gui.netmusic.cd_burner.cd_is_empty");
             return;
         }
         ItemMusicCD.SongInfo songInfo = ItemMusicCD.getSongInfo(cd);
         if (songInfo != null && songInfo.readOnly) {
-            this.tips = Text.translatable("gui.netmusic.cd_burner.cd_read_only");
+            this.tips = new TranslatableText("gui.netmusic.cd_burner.cd_read_only");
             return;
         }
-        if (Util.isBlank(textField.getText())) {
-            this.tips = Text.translatable("gui.netmusic.cd_burner.no_music_id");
+        if (StringUtils.isBlank(textField.getText())) {
+            this.tips = new TranslatableText("gui.netmusic.cd_burner.no_music_id");
             return;
         }
         if (ID_REG.matcher(textField.getText()).matches()) {
@@ -176,17 +175,17 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
             try {
                 ItemMusicCD.SongInfo song = MusicListManage.get163Song(id);
                 if (StringUtils.isBlank(song.songUrl) || StringUtils.isBlank(song.songName)) {
-                    this.tips = Text.translatable("gui.netmusic.cd_burner.get_info_error");
+                    this.tips = new TranslatableText("gui.netmusic.cd_burner.get_info_error");
                     return;
                 }
                 song.readOnly = readOnlyButton.isChecked();
                 ClientNetWorkHandler.sendToServer(new SetMusicIDMessage(song));
             } catch (Exception e) {
-                this.tips = Text.translatable("gui.netmusic.cd_burner.get_info_error");
+                this.tips = new TranslatableText("gui.netmusic.cd_burner.get_info_error");
                 e.printStackTrace();
             }
         } else {
-            this.tips = Text.translatable("gui.netmusic.cd_burner.music_id_error");
+            this.tips = new TranslatableText("gui.netmusic.cd_burner.music_id_error");
         }
     }
 }

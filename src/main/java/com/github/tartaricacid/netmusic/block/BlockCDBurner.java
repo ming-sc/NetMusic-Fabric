@@ -13,7 +13,9 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -47,7 +49,7 @@ public class BlockCDBurner extends HorizontalFacingBlock {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction direction = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction direction = ctx.getPlayerFacing().getOpposite();
         return this.getDefaultState().with(FACING, direction);
     }
 
@@ -69,11 +71,11 @@ public class BlockCDBurner extends HorizontalFacingBlock {
     @Nullable
     @Override
     public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
-        return new SimpleNamedScreenHandlerFactory((id, inventory, player) -> new CDBurnerMenu(id, inventory), Text.empty());
+        return new SimpleNamedScreenHandlerFactory((id, inventory, player) -> new CDBurnerMenu(id, inventory), LiteralText.EMPTY);
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
-        tooltip.add(Text.translatable("block.netmusic.cd_burner.desc").formatted(Formatting.GRAY));
+        tooltip.add(new TranslatableText("block.netmusic.cd_burner.desc").formatted(Formatting.GRAY));
     }
 }
