@@ -1,5 +1,5 @@
 {
-  "itemGroup.netmusic": "Net Music",
+  "itemGroup.netmusic.netmusic_group": "Net Music",
   "item.netmusic.music_cd": "Music CD",
   "item.netmusic.music_player_backpack": "Music Player Backpack",
   "tooltips.netmusic.cd.trans_name": "Name",

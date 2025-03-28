@@ -1,16 +1,14 @@
 package com.github.tartaricacid.netmusic.block;
 
 import com.github.tartaricacid.netmusic.inventory.CDBurnerMenu;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -34,8 +32,8 @@ import java.util.List;
 public class BlockCDBurner extends HorizontalFacingBlock {
     protected static final VoxelShape BLOCK_AABB = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
 
-    public BlockCDBurner(Settings settings) {
-        super(settings);
+    public BlockCDBurner() {
+        super(Settings.of(Material.WOOD).sounds(BlockSoundGroup.WOOD).strength(0.5f).nonOpaque());
         this.setDefaultState(getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
@@ -47,7 +45,7 @@ public class BlockCDBurner extends HorizontalFacingBlock {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction direction = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction direction = ctx.getPlayerFacing().getOpposite();
         return this.getDefaultState().with(FACING, direction);
     }
 

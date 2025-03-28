@@ -30,8 +30,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEntityProvider {
 
-    public BlockMusicPlayer(Settings settings) {
-        super(Settings.create().sounds(BlockSoundGroup.WOOD).strength(0.5f));
+    public BlockMusicPlayer() {
+        super(Settings.of(Material.WOOD).sounds(BlockSoundGroup.WOOD).strength(0.5f).nonOpaque());
         this.setDefaultState(this.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.SOUTH));
     }
 
@@ -69,7 +69,7 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction direction = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction direction = ctx.getPlayerFacing().getOpposite();
         return this.getDefaultState().with(Properties.HORIZONTAL_FACING, direction);
     }
 
@@ -107,7 +107,9 @@ public class BlockMusicPlayer extends HorizontalFacingBlock implements BlockEnti
             return ActionResult.FAIL;
         }
 
-        musicPlayer.setStack(0, heldStack.copyWithCount(1));
+        ItemStack copy = heldStack.copy();
+        copy.setCount(1);
+        musicPlayer.setStack(0, copy);
         if (!player.isCreative()) {
             heldStack.decrement(1);
         }

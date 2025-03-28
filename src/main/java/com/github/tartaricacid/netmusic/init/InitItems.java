@@ -3,16 +3,14 @@ package com.github.tartaricacid.netmusic.init;
 import com.github.tartaricacid.netmusic.NetMusic;
 import com.github.tartaricacid.netmusic.config.MusicListManage;
 import com.github.tartaricacid.netmusic.item.ItemMusicCD;
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 /**
  * @author : IMG
@@ -30,23 +28,23 @@ public class InitItems {
 
     public static Item register(Item item, String id) {
         Identifier itemId = Identifier.of(NetMusic.MOD_ID, id);
-        return Registry.register(Registries.ITEM, itemId, item);
+        return Registry.register(Registry.ITEM, itemId, item);
     }
 
-    public static final ItemGroup NET_MUSIC_TAB = Registry.register(Registries.ITEM_GROUP, new Identifier(NetMusic.MOD_ID, "netmusic_group"), FabricItemGroup.builder()
-            .icon(() -> new ItemStack(InitBlocks.MUSIC_PLAYER))
-            .displayName(Text.translatable("itemGroup.netmusic"))
-            .entries((displayContext, entries) -> {
-                entries.add(new ItemStack(MUSIC_PLAYER));
-                entries.add(new ItemStack(CD_BURNER));
-                entries.add(new ItemStack(COMPUTER));
-                entries.add(new ItemStack(InitItems.MUSIC_CD));
+    public static final ItemGroup NET_MUSIC_TAB = FabricItemGroupBuilder.create(new Identifier(NetMusic.MOD_ID, "netmusic_group"))
+            .icon(() -> new ItemStack(MUSIC_PLAYER))
+            .appendItems(stacks -> {
+                stacks.add(new ItemStack(MUSIC_PLAYER));
+                stacks.add(new ItemStack(CD_BURNER));
+                stacks.add(new ItemStack(COMPUTER));
+                stacks.add(new ItemStack(MUSIC_CD));
                 for (ItemMusicCD.SongInfo info : MusicListManage.SONGS) {
                     ItemStack stack = new ItemStack(MUSIC_CD);
                     ItemMusicCD.setSongInfo(info, stack);
-                    entries.add(stack);
+                    stacks.add(stack);
                 }
-            }).build());
+            })
+            .build();
 
     public static void init() {
     }

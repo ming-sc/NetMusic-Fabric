@@ -93,8 +93,8 @@ public class NetWorker {
     }
 
     private static Proxy getProxyFromConfig() {
-        Proxy.Type proxyType = GeneralConfig.PROXY_TYPE;
-        String proxyAddress = GeneralConfig.PROXY_ADDRESS;
+        Proxy.Type proxyType = GeneralConfig.PROXY_TYPE.get();
+        String proxyAddress = GeneralConfig.PROXY_ADDRESS.get();
         if (proxyType == Proxy.Type.DIRECT || StringUtils.isBlank(proxyAddress)) {
             return Proxy.NO_PROXY;
         }

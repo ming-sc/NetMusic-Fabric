@@ -1,10 +1,7 @@
 package com.github.tartaricacid.netmusic.block;
 
 import com.github.tartaricacid.netmusic.inventory.ComputerMenu;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -40,8 +37,8 @@ public class BlockComputer extends HorizontalFacingBlock {
     protected static final VoxelShape EAST_AABB = rotateShape(Direction.SOUTH, Direction.EAST, NORTH_AABB);
     protected static final VoxelShape WEST_AABB = rotateShape(Direction.NORTH, Direction.EAST, NORTH_AABB);
 
-    public BlockComputer(Settings settings) {
-        super(Settings.create().sounds(BlockSoundGroup.WOOD).strength(0.5f));
+    public BlockComputer() {
+        super(Settings.of(Material.WOOD).sounds(BlockSoundGroup.WOOD).strength(0.5f).nonOpaque());
         this.setDefaultState(this.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
@@ -91,7 +88,7 @@ public class BlockComputer extends HorizontalFacingBlock {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction direction = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction direction = ctx.getPlayerFacing().getOpposite();
         return this.getDefaultState().with(FACING, direction);
     }
 

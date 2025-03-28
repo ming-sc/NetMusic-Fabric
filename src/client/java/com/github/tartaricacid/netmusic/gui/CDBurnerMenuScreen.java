@@ -8,18 +8,17 @@ import com.github.tartaricacid.netmusic.network.ClientNetWorkHandler;
 import com.github.tartaricacid.netmusic.networking.message.SetMusicIDMessage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
@@ -79,39 +78,37 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
         textField.setDrawsBackground(false);
         textField.setMaxLength(19);
         textField.setEditableColor(0xF3EFE0);
-        textField.setFocused(focus);
+        textField.setTextFieldFocused(focus);
         textField.setCursorToEnd();
         this.addSelectableChild(textField);
 
         this.readOnlyButton = new CheckboxWidget(x + 66, y + 34, 80, 20, Text.translatable("gui.netmusic.cd_burner.read_only"), false);
         this.addDrawableChild(readOnlyButton);
         this.addDrawableChild(
-                ButtonWidget.builder(Text.translatable("gui.netmusic.cd_burner.craft"), button -> handleCraftButton())
-                        .position(x + 7, y + 35)
-                        .size(55, 18)
-                        .build()
+                new ButtonWidget(x + 7, y + 34, 55, 20, Text.translatable("gui.netmusic.cd_burner.craft"), button -> handleCraftButton())
         );
     }
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+        renderBackground(matrices);
         int posX = this.x;
         int posY = this.y;
-        context.drawTexture(BG, posX, posY, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, BG);
+        drawTexture(matrices, posX, posY, 0, 0, backgroundWidth, backgroundHeight);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
-        super.render(context, mouseX, mouseY, delta);
-        textField.render(context, mouseX, mouseY, delta);
-        if (Util.isBlank(textField.getText()) && !textField.isFocused()) {
-            context.drawText(textRenderer, Text.translatable("gui.netmusic.cd_burner.id.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 18, Formatting.GRAY.getColorValue(), false);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        textField.render(matrices, mouseX, mouseY, delta);
+        if (StringUtils.isBlank(textField.getText()) && !textField.isFocused()) {
+            drawTextWithShadow(matrices, textRenderer, Text.translatable("gui.netmusic.cd_burner.id.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 18, Formatting.GRAY.getColorValue());
         }
-        context.drawTextWrapped(textRenderer, tips, this.x + 8, this.y + 57, 135, 0xCF0000);
-        this.drawMouseoverTooltip(context, mouseX, mouseY);
+        textRenderer.drawTrimmed(tips, this.x + 8, this.y + 57, 135, 0xCF0000);
+        drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
@@ -167,7 +164,7 @@ public class CDBurnerMenuScreen extends HandledScreen<CDBurnerMenu> {
             this.tips = Text.translatable("gui.netmusic.cd_burner.cd_read_only");
             return;
         }
-        if (Util.isBlank(textField.getText())) {
+        if (StringUtils.isBlank(textField.getText())) {
             this.tips = Text.translatable("gui.netmusic.cd_burner.no_music_id");
             return;
         }

@@ -7,17 +7,18 @@ import com.github.tartaricacid.netmusic.network.ClientNetWorkHandler;
 import com.github.tartaricacid.netmusic.networking.message.SetMusicIDMessage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.apache.commons.lang3.StringUtils;
 import oshi.util.Util;
 
 import java.io.File;
@@ -56,10 +57,16 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
         this.readOnlyButton = new CheckboxWidget(x + 58, y + 55, 80, 20,
                 Text.translatable("gui.netmusic.cd_burner.read_only"), false);
         this.addDrawableChild(readOnlyButton);
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.netmusic.cd_burner.craft"), button -> handleCraftButton())
-                .position(x + 7, y + 78)
-                .size(135, 18)
-                .build());
+        this.addDrawableChild(
+                new ButtonWidget(
+                        x + 7,
+                        y + 77,
+                        135,
+                        20,
+                        Text.translatable("gui.netmusic.cd_burner.craft"),
+                        button -> handleCraftButton()
+                )
+        );
     }
 
     private void initUrlEditBox() {
@@ -74,7 +81,7 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
         urlTextField.setDrawsBackground(false);
         urlTextField.setMaxLength(32500);
         urlTextField.setEditableColor(0xF3EFE0);
-        urlTextField.setFocused(focus);
+        urlTextField.setTextFieldFocused(focus);
         urlTextField.setCursorToEnd();
         this.addSelectableChild(urlTextField);
     }
@@ -91,7 +98,7 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
         nameTextField.setDrawsBackground(false);
         nameTextField.setMaxLength(256);
         nameTextField.setEditableColor(0xF3EFE0);
-        nameTextField.setFocused(focus);
+        nameTextField.setTextFieldFocused(focus);
         nameTextField.setCursorToEnd();
         this.addSelectableChild(nameTextField);
     }
@@ -108,7 +115,7 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
         timeTextField.setDrawsBackground(false);
         timeTextField.setMaxLength(5);
         timeTextField.setEditableColor(0xF3EFE0);
-        timeTextField.setFocused(focus);
+        timeTextField.setTextFieldFocused(focus);
         timeTextField.setCursorToEnd();
         this.addSelectableChild(timeTextField);
     }
@@ -171,32 +178,33 @@ public class ComputerMenuScreen extends HandledScreen<ComputerMenu> {
     }
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+        renderBackground(matrices);
         int posX = this.x;
         int posY = this.y;
-        context.drawTexture(BG, posX, posY, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, BG);
+        drawTexture(matrices, posX, posY, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
-        super.render(context, mouseX, mouseY, delta);
-        urlTextField.render(context, mouseX, mouseY, delta);
-        nameTextField.render(context, mouseX, mouseY, delta);
-        timeTextField.render(context, mouseX, mouseY, delta);
-        if (Util.isBlank(urlTextField.getText()) && !urlTextField.isFocused()) {
-            context.drawText(textRenderer, Text.translatable("gui.netmusic.computer.url.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 18, Formatting.GRAY.getColorValue(), false);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        urlTextField.render(matrices, mouseX, mouseY, delta);
+        nameTextField.render(matrices, mouseX, mouseY, delta);
+        timeTextField.render(matrices, mouseX, mouseY, delta);
+        if (StringUtils.isBlank(urlTextField.getText()) && !urlTextField.isFocused()) {
+            textRenderer.draw(matrices, Text.translatable("gui.netmusic.computer.url.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 18, Formatting.GRAY.getColorValue());
         }
-        if (Util.isBlank(nameTextField.getText()) && !nameTextField.isFocused()) {
-            context.drawText(textRenderer, Text.translatable("gui.netmusic.computer.name.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 39, Formatting.GRAY.getColorValue(), false);
+        if (StringUtils.isBlank(nameTextField.getText()) && !nameTextField.isFocused()) {
+            textRenderer.draw(matrices, Text.translatable("gui.netmusic.computer.name.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 39, Formatting.GRAY.getColorValue());
         }
-        if (Util.isBlank(timeTextField.getText()) && !timeTextField.isFocused()) {
-            context.drawText(textRenderer, Text.translatable("gui.netmusic.computer.time.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 61, Formatting.GRAY.getColorValue(), false);
+        if (StringUtils.isBlank(timeTextField.getText()) && !timeTextField.isFocused()) {
+            textRenderer.draw(matrices, Text.translatable("gui.netmusic.computer.time.tips").formatted(Formatting.ITALIC), this.x + 12, this.y + 61, Formatting.GRAY.getColorValue());
         }
-        context.drawTextWrapped(textRenderer, tips, this.x + 8, this.y + 100, 162, 0xCF0000);
-        drawMouseoverTooltip(context, mouseX, mouseY);
+        textRenderer.drawTrimmed(tips, this.x + 8, this.y + 100, 162, 0xCF0000);
+        drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override

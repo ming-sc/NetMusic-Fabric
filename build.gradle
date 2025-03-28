@@ -42,6 +42,10 @@ repositories {
         name 'Xander Maven'
         url 'https://maven.isxander.dev/releases'
     }
+    maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+    }
 }
 
 loom {
@@ -68,7 +72,9 @@ dependencies {
     implementation include("com.googlecode.soundlibs:jlayer:1.0.1.4")
     implementation include("com.googlecode.soundlibs:tritonus-share:0.3.7.4")
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation include("dev.isxander:yet-another-config-lib:3.5.0+1.20.1-fabric")
+    // Forge Config API Port
+    implementation include("com.electronwill.night-config:core:3.6.5")
+    modImplementation ("net.minecraftforge:forgeconfigapiport-fabric:${forge_config_api_port_version}")
     // Fabric API
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     // JEI
