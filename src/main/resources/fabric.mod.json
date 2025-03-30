@@ -32,10 +32,10 @@
   ],
   "depends": {
     "fabricloader": ">=0.16.7",
-    "minecraft": "~1.16.5",
+    "minecraft": "~1.16.2",
     "java": ">=8",
     "fabric": "*",
-    "forgeconfigapiport": ">=1.0.0"
+    "forgeconfigapiport": ">=1.0.0 <=1.0.1"
   },
   "suggests": {
     "another-mod": "*"
