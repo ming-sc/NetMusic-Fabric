@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.github.tartaricacid.netmusic.client.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "SoundSystemAccessor",
+    "SoundSystemMixin"
+  ]
+}

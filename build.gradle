@@ -1,0 +1,97 @@
+plugins {
+	id 'fabric-loom' version '1.8-SNAPSHOT'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+allprojects {
+	repositories {
+		maven {
+			url 'https://maven.aliyun.com/repository/public/'
+		}
+		mavenLocal()
+		mavenCentral()
+	}
+}
+
+repositories {
+	maven {
+		// location of the maven that hosts JEI files since January 2023
+		// Patchouli
+		name = "Jared's maven"
+		url = "https://maven.blamejared.com/"
+	}
+	maven {
+		// location of a maven mirror for JEI files, as a fallback
+		name = "ModMaven"
+		url = "https://modmaven.dev"
+	}
+	maven {
+		name = "Curse Maven"
+		url = "https://www.cursemaven.com"
+		content {
+			includeGroup "curse.maven"
+		}
+	}
+	maven {
+		name 'Xander Maven'
+		url 'https://maven.isxander.dev/releases'
+	}
+	maven {
+		name = "Fuzs Mod Resources"
+		url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+	}
+	mavenCentral()
+}
+
+loom {
+
+}
+
+fabricApi {
+	configureDataGeneration()
+}
+
+dependencies {
+	// To change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	implementation include("com.googlecode.soundlibs:mp3spi:1.9.5.4")
+	implementation include("com.googlecode.soundlibs:jlayer:1.0.1.4")
+	implementation include("com.googlecode.soundlibs:tritonus-share:0.3.7.4")
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation include("com.electronwill.night-config:core:3.6.5")
+	modImplementation ("net.minecraftforge:forgeconfigapiport-fabric:${forge_config_api_port_version}")
+	// Fabric API.
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 8
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+jar {
+	from("LICENSE") {
+		rename { "${it}_${project.base.archivesName.get()}"}
+	}
+}
